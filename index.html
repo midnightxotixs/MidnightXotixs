@@ -6,12 +6,10 @@
   <title>Midnight Treats — Artisanal Bakes &amp; Confections</title>
   <meta name="description" content="Handcrafted artisan pastries baked fresh under the moonlight."/>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet"/>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -37,8 +35,8 @@
       --border-glow-purple:rgba(168,85,247,.5);
       --border-glow-amber:rgba(245,158,11,.5);
     }
-    /* ── Prevent FOUC: hide both panes by default; inline script reveals correct one ── */
-    #bakery-ui    { display:none; }
+    /* Prevent FOUC — inline gate script sets display */
+    #bakery-ui      { display:none; }
     #hidden-chamber { display:none; }
 
     body { background-color:#FAF7F2; font-family:'Plus Jakarta Sans',sans-serif; color:#334155; }
@@ -49,41 +47,52 @@
 
     @keyframes shimmer {
       0%   { background-position:-200% 0; }
-      100% { background-position:200% 0; }
+      100% { background-position: 200% 0; }
     }
     .skeleton {
       background:linear-gradient(90deg,#f0ebe4 25%,#faf7f2 50%,#f0ebe4 75%);
-      background-size:200% 100%;
-      animation:shimmer 1.5s infinite;
-      border-radius:.75rem;
+      background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:.75rem;
     }
     .skeleton-dark {
       background:linear-gradient(90deg,#131926 25%,#0d1220 50%,#131926 75%);
-      background-size:200% 100%;
-      animation:shimmer 1.6s infinite;
-      border-radius:.75rem;
+      background-size:200% 100%; animation:shimmer 1.6s infinite; border-radius:.75rem;
     }
 
-    /* Neon glow helpers */
-    .neon-red    { border-color:var(--border-glow-red);    box-shadow:0 0 16px var(--border-glow-red);    }
-    .neon-blue   { border-color:var(--border-glow-blue);   box-shadow:0 0 16px var(--border-glow-blue);   }
-    .neon-green  { border-color:var(--border-glow-green);  box-shadow:0 0 16px var(--border-glow-green);  }
-    .neon-purple { border-color:var(--border-glow-purple); box-shadow:0 0 16px var(--border-glow-purple); }
-    .neon-amber  { border-color:var(--border-glow-amber);  box-shadow:0 0 16px var(--border-glow-amber);  }
-
-    /* Checkout bar slide */
     #checkout-bar { transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease; }
     #checkout-bar.hidden-bar { transform:translateY(100%); opacity:0; pointer-events:none; }
-    .pb-safe { padding-bottom:env(safe-area-inset-bottom,16px); }
+
+    /* Pre-order modal */
+    #preorder-modal { display:none; }
+    @keyframes cyberFadeIn {
+      from { opacity:0; transform:scale(.96) translateY(12px); }
+      to   { opacity:1; transform:scale(1)   translateY(0); }
+    }
+    .cyber-modal-inner { animation:cyberFadeIn .22s ease forwards; }
+
+    /* Cyber input style */
+    .cyber-input {
+      width:100%; padding:10px 14px; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:13px;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#e2e8f0;
+      outline:none; transition:border-color .2s, box-shadow .2s; min-height:44px;
+    }
+    .cyber-input:focus { border-color:rgba(34,211,238,.6); box-shadow:0 0 12px rgba(34,211,238,.2); }
+    .cyber-input::placeholder { color:#475569; }
+
+    /* Spinner */
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .cyber-spin { animation:spin .7s linear infinite; }
+
+    /* Success pulse */
+    @keyframes successPulse {
+      0%,100% { box-shadow:0 0 20px rgba(16,185,129,.3); }
+      50%     { box-shadow:0 0 40px rgba(16,185,129,.7); }
+    }
+    .success-ring { animation:successPulse 2s ease-in-out infinite; }
   </style>
 
-  <!--
-    ███████████████████████████████████████████████████████████
-    ANTI-FLICKER SESSION GATE — runs synchronously before paint
-    ███████████████████████████████████████████████████████████
-    Reads localStorage immediately and sets the correct initial
-    display state so there is zero flash of the wrong page.
-  -->
+  <!-- ██████████████████████████████████████████████
+       ANTI-FLICKER SESSION GATE — synchronous check
+  ██████████████████████████████████████████████ -->
   <script>
     (function() {
       try {
@@ -91,15 +100,13 @@
         if (raw) {
           var sess = JSON.parse(raw);
           if (sess && sess.authenticated && Date.now() < sess.expiresAt) {
-            // Valid session → prepare to show chamber, not bakery
+            window.__xotixs_authed   = true;
+            window.__xotixs_passcode = sess.passcode || '';
             document.addEventListener('DOMContentLoaded', function() {
               document.getElementById('bakery-ui').style.display      = 'none';
               document.getElementById('hidden-chamber').style.display = 'flex';
               document.getElementById('hidden-chamber').style.flexDirection = 'column';
-              document.getElementById('hidden-chamber').style.minHeight = '100vh';
             });
-            // Mark so main script knows to skip auth
-            window.__xotixs_authed = true;
             return;
           } else {
             localStorage.removeItem('xotixs_session');
@@ -107,11 +114,9 @@
           }
         }
       } catch(e) {}
-      // No valid session → show bakery
       document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('bakery-ui').style.display = 'flex';
+        document.getElementById('bakery-ui').style.display      = 'flex';
         document.getElementById('bakery-ui').style.flexDirection = 'column';
-        document.getElementById('bakery-ui').style.minHeight = '100vh';
       });
     })();
   </script>
@@ -121,7 +126,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  1. BAKERY DECOY FRONT                                     -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="bakery-ui" class="flex-col bg-[#FAF7F2]">
+<div id="bakery-ui" class="bg-[#FAF7F2]" style="min-height:100vh;">
 
   <header class="sticky top-0 z-30 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-pink-100">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
@@ -203,7 +208,7 @@
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
-<!--  2. AUTH MODAL                                            -->
+<!--  2. AUTH MODAL (Decoy gateway)                            -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <div id="auth-modal" class="fixed inset-0 z-50 items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm" style="display:none;">
   <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-pink-100 max-w-md w-full p-6 sm:p-8 relative">
@@ -212,13 +217,13 @@
     </button>
 
     <!-- LOGIN VIEW -->
-    <div id="login-view" class="space-y-5">
-      <div>
+    <div id="login-view">
+      <div class="mb-5">
         <div class="w-9 h-9 rounded-xl bg-[#FCE4EC] flex items-center justify-center text-lg mb-3">🥐</div>
         <h2 class="heading-serif text-xl sm:text-2xl font-bold text-slate-800">Member Sign In</h2>
         <p class="text-xs text-slate-500 mt-0.5">Access your pastry subscriptions and seasonal allocations.</p>
       </div>
-      <div id="login-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2" style="display:none;">
+      <div id="login-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2 mb-4" style="display:none;">
         <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         <span>Account not found. Please register as an authorized member first.</span>
       </div>
@@ -233,19 +238,19 @@
         </div>
         <button type="submit" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm transition-colors active:scale-[0.99] min-h-[44px]">Sign In</button>
       </form>
-      <div class="text-center pt-1 border-t border-slate-100">
+      <div class="text-center pt-3 border-t border-slate-100 mt-4">
         <p class="text-xs text-slate-500">Don't have an account? <button id="go-to-register-btn" class="font-semibold text-slate-800 hover:text-pink-600 underline ml-1">Register here</button></p>
       </div>
     </div>
 
     <!-- REGISTER VIEW -->
-    <div id="register-view" class="space-y-5" style="display:none;">
-      <div>
+    <div id="register-view" style="display:none;">
+      <div class="mb-5">
         <div class="w-9 h-9 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-lg mb-3">🗝️</div>
         <h2 class="heading-serif text-xl sm:text-2xl font-bold text-slate-800">Register / Become a Member</h2>
         <p class="text-xs text-slate-500 mt-0.5">Enter your credentials and invitation pass.</p>
       </div>
-      <div id="register-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2" style="display:none;">
+      <div id="register-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2 mb-4" style="display:none;">
         <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         <span id="register-error-text">Invalid or expired invitation pass.</span>
       </div>
@@ -267,14 +272,14 @@
           <p class="text-[11px] text-slate-400 mt-1">Single-use pass verified via encrypted protocol.</p>
         </div>
         <button type="submit" id="register-submit-btn" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm transition-colors active:scale-[0.99] flex items-center justify-center space-x-2 min-h-[44px]">
-          <svg id="register-btn-spinner" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display:none;">
+          <svg id="register-btn-spinner" class="cyber-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display:none;">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
           <span id="register-btn-text">Complete Registration</span>
         </button>
       </form>
-      <div class="text-center pt-1 border-t border-slate-100">
+      <div class="text-center pt-3 border-t border-slate-100 mt-4">
         <p class="text-xs text-slate-500">Already a member? <button id="go-to-login-btn" class="font-semibold text-slate-800 hover:text-sky-600 underline ml-1">Sign In here</button></p>
       </div>
     </div>
@@ -285,7 +290,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  3. MIDNIGHT XOTIXS — CYBERPUNK QUICK-COMMERCE CHAMBER   -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="hidden-chamber" class="flex-col w-full" style="min-height:100vh;background-color:#0A0D14;">
+<div id="hidden-chamber" class="w-full" style="background-color:#0A0D14;min-height:100vh;">
 
   <!-- Sticky Topbar -->
   <header class="sticky top-0 z-40 border-b border-slate-800/80" style="background-color:rgba(10,13,20,0.95);backdrop-filter:blur(16px);">
@@ -309,7 +314,7 @@
       </div>
     </div>
 
-    <!-- Sticky Category Pills -->
+    <!-- Category Pills -->
     <div id="category-bar" class="max-w-5xl mx-auto px-4 py-2 flex space-x-2 overflow-x-auto no-scrollbar border-t border-slate-800/60">
       <div class="skeleton-dark h-8 w-12 rounded-full shrink-0"></div>
       <div class="skeleton-dark h-8 w-20 rounded-full shrink-0"></div>
@@ -318,8 +323,8 @@
     </div>
   </header>
 
-  <!-- Main Catalog -->
-  <main id="chamber-main" class="flex-grow max-w-5xl mx-auto w-full px-4 py-6 pb-32 space-y-10">
+  <!-- Catalog -->
+  <main id="chamber-main" class="max-w-5xl mx-auto w-full px-4 py-6 pb-36 space-y-10">
     <div id="chamber-skeleton" class="space-y-4">
       <div class="skeleton-dark h-6 w-32 rounded mb-6"></div>
       <div class="skeleton-dark h-24 w-full rounded-2xl"></div>
@@ -331,72 +336,178 @@
 
   <!-- Floating Checkout Bar -->
   <div id="checkout-bar" class="fixed bottom-4 inset-x-4 z-50 max-w-lg mx-auto hidden-bar" aria-live="polite">
-    <div class="rounded-2xl border border-slate-700 flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4" style="background:rgba(15,20,32,0.98);backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);">
-      <div class="flex items-center space-x-3">
+    <div class="rounded-2xl border border-slate-700 flex items-center justify-between px-4 py-3 gap-3" style="background:rgba(15,20,32,0.98);backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);">
+      <div class="flex items-center space-x-3 shrink-0">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl relative" style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);">
           🛒
           <span id="cart-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold font-mono text-white" style="background:#ef4444;">0</span>
         </div>
         <div>
-          <p class="text-xs text-slate-400 font-mono leading-none">YOUR ORDER</p>
-          <p id="cart-summary-text" class="text-white font-bold text-sm sm:text-base font-mono leading-tight mt-0.5">0 items &bull; $0.00</p>
+          <p class="text-[10px] text-slate-400 font-mono leading-none">YOUR ORDER</p>
+          <p id="cart-summary-text" class="text-white font-bold text-sm font-mono leading-tight mt-0.5">0 items &bull; $0.00</p>
         </div>
       </div>
-      <button id="proceed-to-chat-btn" class="min-h-[44px] px-4 sm:px-6 py-2 rounded-xl font-mono font-bold text-sm text-white flex items-center space-x-2 active:scale-95 transition-all" style="background:linear-gradient(135deg,#22d3ee,#6366f1);box-shadow:0 0 20px rgba(34,211,238,0.35);">
-        <span>Proceed to Chat</span>
-        <span class="text-base">➜</span>
+      <button id="open-preorder-btn" class="min-h-[44px] px-3 sm:px-5 py-2 rounded-xl font-mono font-bold text-xs sm:text-sm text-white flex items-center space-x-1.5 active:scale-95 transition-all whitespace-nowrap" style="background:linear-gradient(135deg,#22d3ee,#6366f1);box-shadow:0 0 20px rgba(34,211,238,0.35);">
+        <span>Schedule Pickup</span>
+        <span>➜</span>
       </button>
     </div>
   </div>
 
   <!-- Toast container -->
-  <div id="toast-container" class="fixed bottom-24 right-4 z-50 pointer-events-none flex flex-col items-end space-y-2 max-w-xs"></div>
-
-</div><!-- end hidden-chamber -->
+  <div id="toast-container" class="fixed bottom-28 right-4 z-50 pointer-events-none flex flex-col items-end space-y-2 max-w-xs"></div>
+</div>
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
-<!--  4. JAVASCRIPT                                            -->
+<!--  4. CYBERPUNK PRE-ORDER MODAL                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="preorder-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" style="background:rgba(5,8,15,0.85);backdrop-filter:blur(10px);">
+  <div class="cyber-modal-inner w-full max-w-lg rounded-t-3xl sm:rounded-2xl overflow-hidden" style="background:#0D1220;border:1px solid rgba(34,211,238,0.25);box-shadow:0 0 60px rgba(34,211,238,0.1),0 32px 64px rgba(0,0,0,0.8);">
+
+    <!-- Modal Header -->
+    <div class="px-5 py-4 flex items-center justify-between border-b" style="border-color:rgba(34,211,238,0.15);background:rgba(34,211,238,0.04);">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background:rgba(34,211,238,0.15);border:1px solid rgba(34,211,238,0.4);">📦</div>
+        <div>
+          <h3 class="font-street font-black text-white tracking-wider text-sm uppercase">Schedule Pickup / Pre-Order</h3>
+          <p class="text-[10px] font-mono text-slate-500 -mt-0.5">ENCRYPTED ORDER PROTOCOL v2.4</p>
+        </div>
+      </div>
+      <button id="close-preorder-btn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 transition-colors" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- FORM VIEW -->
+    <div id="preorder-form-view" class="overflow-y-auto" style="max-height:80vh;">
+      <div class="p-5 space-y-4">
+
+        <!-- Order Summary -->
+        <div class="rounded-xl p-4 space-y-2" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+          <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 mb-3">Order Summary</p>
+          <div id="modal-order-items" class="space-y-2"></div>
+          <div class="flex items-center justify-between pt-2 mt-2" style="border-top:1px solid rgba(255,255,255,0.07);">
+            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Total</span>
+            <span id="modal-order-total" class="font-mono font-bold text-base" style="color:#22d3ee;">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Customer Name / Alias</label>
+          <input type="text" id="po-name" class="cyber-input" placeholder="e.g. Phantom_7, Alex M." required/>
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Contact Handle / Phone</label>
+          <input type="text" id="po-contact" class="cyber-input" placeholder="WhatsApp: +880XXXXXXXXXX or @TelegramUser" required/>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Date</label>
+            <input type="date" id="po-date" class="cyber-input" required/>
+          </div>
+          <div>
+            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Time</label>
+            <select id="po-time" class="cyber-input">
+              <option value="Afternoon (12PM–4PM)">Afternoon (12–4 PM)</option>
+              <option value="Evening (4PM–8PM)">Evening (4–8 PM)</option>
+              <option value="Night (8PM–12AM)">Night (8 PM–12 AM)</option>
+              <option value="Late Night (12AM–4AM)">Late Night (12–4 AM)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Location / Meeting Spot</label>
+          <input type="text" id="po-location" class="cyber-input" placeholder="e.g. Downtown Lounge, 5th Ave Corner" required/>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="preorder-submit-btn" class="w-full min-h-[48px] rounded-xl font-mono font-black text-sm uppercase tracking-wider flex items-center justify-center space-x-2 transition-all active:scale-[0.99]" style="background:linear-gradient(135deg,#22d3ee,#6366f1);color:#fff;box-shadow:0 0 24px rgba(34,211,238,0.4);">
+          <svg id="preorder-spinner" class="cyber-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" style="display:none;">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span id="preorder-submit-text">🔒 Secure Pre-Order</span>
+        </button>
+
+        <p class="text-center text-[10px] font-mono text-slate-600 leading-relaxed">
+          Submission encrypted &bull; Single-use dispatch protocol &bull; Response via chat within 2 hrs
+        </p>
+      </div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div id="preorder-success-view" class="p-6 text-center space-y-6" style="display:none;">
+      <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl success-ring" style="background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.6);">✓</div>
+      <div class="space-y-2">
+        <h3 class="font-street font-black text-xl text-white tracking-wider uppercase">Order Confirmed!</h3>
+        <p class="text-sm font-mono text-slate-400 leading-relaxed">Your pre-order has been secured!<br/>We are preparing your stash.</p>
+        <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>ORDER ID: <span id="success-order-id" class="font-bold">MX-XXXXXX</span></span>
+        </div>
+      </div>
+
+      <!-- Order recap -->
+      <div id="success-summary" class="text-left rounded-xl p-4 space-y-2 text-xs font-mono text-slate-400" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);"></div>
+
+      <div class="space-y-3 pt-2">
+        <button id="success-chat-btn" class="w-full min-h-[46px] rounded-xl font-mono font-bold text-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.99]" style="background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.4);color:#25d366;box-shadow:0 0 16px rgba(37,211,102,0.2);">
+          <span>💬</span>
+          <span>Send Copy via WhatsApp / Telegram</span>
+        </button>
+        <button id="success-done-btn" class="w-full min-h-[46px] rounded-xl font-mono font-bold text-sm transition-all active:scale-[0.99]" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;">
+          Done — Close &amp; Clear Cart
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div><!-- end preorder-modal -->
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!--  5. JAVASCRIPT                                            -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <script>
   /* ═══════════════════════════════════════════════════════════
-     SANITY CONFIG
+     CONSTANTS
   ═══════════════════════════════════════════════════════════ */
   var SANITY_PROJECT_ID  = "9qdzkhb5";
   var SANITY_DATASET     = "production";
   var SANITY_API_VERSION = "2024-01-01";
   var SANITY_WRITE_TOKEN = "skjo7VQZwtVNCSBWf3rShfA68Ho8S4t3Qgo23isdlh3oQCLpfqawBod2LCYeBEiThoNwHVOFFE5jzybeYTrsBMmY4ir0w0YDumJ126qnHZoGdEv1MeVDBjQmHWyWIfXZDknzGkpPiOK7ej0POMcHsvKvr3y2449RBs1YrFyMZTO83fQW2SrS";
 
+  var GOOGLE_SCRIPT_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbztZIyaTRBSJZ8AGUGrZBS7bwJ46XJc8Jub9755lzZG-ARX5Ve-41QH7swKc3vII5Djkw/exec';
+
   var SESSION_KEY = 'xotixs_session';
   var CART_KEY    = 'xotixs_cart';
-  var SESSION_TTL = 3 * 60 * 60 * 1000; // 3 hours
+  var SESSION_TTL = 3 * 60 * 60 * 1000;
 
   /* ═══════════════════════════════════════════════════════════
-     SESSION HELPERS
+     SESSION
   ═══════════════════════════════════════════════════════════ */
-  function saveSession() {
+  function saveSession(passcode) {
     try {
       localStorage.setItem(SESSION_KEY, JSON.stringify({
         authenticated: true,
+        passcode: passcode || '',
         expiresAt: Date.now() + SESSION_TTL
       }));
     } catch(e) {}
   }
 
   function clearSession() {
-    try {
-      localStorage.removeItem(SESSION_KEY);
-      localStorage.removeItem(CART_KEY);
-    } catch(e) {}
+    try { localStorage.removeItem(SESSION_KEY); localStorage.removeItem(CART_KEY); } catch(e) {}
   }
 
-  function isSessionValid() {
+  function getSessionPasscode() {
     try {
       var raw = localStorage.getItem(SESSION_KEY);
-      if (!raw) return false;
-      var s = JSON.parse(raw);
-      return s && s.authenticated && Date.now() < s.expiresAt;
-    } catch(e) { return false; }
+      if (!raw) return '';
+      return JSON.parse(raw).passcode || '';
+    } catch(e) { return ''; }
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -405,12 +516,8 @@
   function saveCart() {
     try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e) {}
   }
-
   function loadCart() {
-    try {
-      var raw = localStorage.getItem(CART_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch(e) { return {}; }
+    try { var r = localStorage.getItem(CART_KEY); return r ? JSON.parse(r) : {}; } catch(e) { return {}; }
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -432,9 +539,10 @@
   var allCategories  = [];
   var orderChatUrl   = '';
   var chamberLoaded  = false;
+  var lastOrderData  = null;  // stored for success screen chat button
 
   /* ═══════════════════════════════════════════════════════════
-     COLOR THEME MAP
+     THEME MAP
   ═══════════════════════════════════════════════════════════ */
   var THEMES = {
     red:    { border:'rgba(239,68,68,.5)',   glow:'rgba(239,68,68,.25)',   text:'#fca5a5', pillBg:'rgba(239,68,68,.12)',   btnBg:'rgba(239,68,68,.9)',  btnText:'#fff',    sectionHead:'#ef4444' },
@@ -443,32 +551,29 @@
     purple: { border:'rgba(168,85,247,.5)',  glow:'rgba(168,85,247,.25)',  text:'#d8b4fe', pillBg:'rgba(168,85,247,.12)',  btnBg:'rgba(168,85,247,.9)',btnText:'#fff',    sectionHead:'#a855f7' },
     amber:  { border:'rgba(245,158,11,.5)',  glow:'rgba(245,158,11,.25)',  text:'#fcd34d', pillBg:'rgba(245,158,11,.12)',  btnBg:'rgba(245,158,11,.9)',btnText:'#0f172a', sectionHead:'#f59e0b' },
   };
-  function theme(color) { return THEMES[color] || THEMES.blue; }
+  function theme(c) { return THEMES[c] || THEMES.blue; }
 
   /* ═══════════════════════════════════════════════════════════
-     SHOW / HIDE HELPERS (using style.display — no class battles)
+     VIEW HELPERS
   ═══════════════════════════════════════════════════════════ */
   function showBakery() {
     document.getElementById('bakery-ui').style.display      = 'flex';
+    document.getElementById('bakery-ui').style.flexDirection = 'column';
     document.getElementById('hidden-chamber').style.display = 'none';
     document.getElementById('auth-modal').style.display     = 'none';
   }
-
   function showChamber() {
     document.getElementById('bakery-ui').style.display      = 'none';
     document.getElementById('hidden-chamber').style.display = 'flex';
+    document.getElementById('hidden-chamber').style.flexDirection = 'column';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-
-  function showModal(view) {
+  function showAuthModal(view) {
     document.getElementById('auth-modal').style.display = 'flex';
-    resetForms();
+    resetAuthForms();
     if (view === 'register') { showRegView(); } else { showLoginView(); }
   }
-  function hideModal() {
-    document.getElementById('auth-modal').style.display = 'none';
-    resetForms();
-  }
+  function hideAuthModal() { document.getElementById('auth-modal').style.display = 'none'; resetAuthForms(); }
   function showLoginView() {
     document.getElementById('login-view').style.display    = 'block';
     document.getElementById('register-view').style.display = 'none';
@@ -479,17 +584,176 @@
     document.getElementById('login-view').style.display    = 'none';
     document.getElementById('register-error').style.display = 'none';
   }
-  function resetForms() {
+  function resetAuthForms() {
     document.getElementById('login-form').reset();
     document.getElementById('register-form').reset();
     document.getElementById('login-error').style.display    = 'none';
     document.getElementById('register-error').style.display = 'none';
-    setLoading(false);
+    setAuthLoading(false);
   }
-  function setLoading(on) {
+  function setAuthLoading(on) {
     document.getElementById('register-submit-btn').disabled = on;
     document.getElementById('register-btn-spinner').style.display = on ? 'inline-block' : 'none';
     document.getElementById('register-btn-text').textContent = on ? 'Verifying...' : 'Complete Registration';
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PREORDER MODAL
+  ═══════════════════════════════════════════════════════════ */
+  function openPreorderModal() {
+    var entries = Object.values(cart);
+    if (entries.length === 0) { showToast('Add items first!', 'amber'); return; }
+
+    // Set today as min date
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('po-date').min   = today;
+    document.getElementById('po-date').value = today;
+
+    // Populate order summary
+    var totalPrice = 0;
+    var itemsHtml = entries.map(function(e) {
+      var n = parseFloat((e.price || '0').replace(/[^0-9.]/g,'')) || 0;
+      totalPrice += n * e.qty;
+      return '<div class="flex items-center justify-between">' +
+        '<span class="text-slate-300">' + e.qty + 'x ' + e.title + '</span>' +
+        '<span style="color:#22d3ee;">' + e.price + '</span>' +
+        '</div>';
+    }).join('');
+    document.getElementById('modal-order-items').innerHTML = itemsHtml;
+    document.getElementById('modal-order-total').textContent = '$' + totalPrice.toFixed(2);
+
+    // Show form view, hide success
+    document.getElementById('preorder-form-view').style.display  = 'block';
+    document.getElementById('preorder-success-view').style.display = 'none';
+    setPreorderLoading(false);
+
+    document.getElementById('preorder-modal').style.display = 'flex';
+  }
+
+  function closePreorderModal() {
+    document.getElementById('preorder-modal').style.display = 'none';
+  }
+
+  function setPreorderLoading(on) {
+    document.getElementById('preorder-submit-btn').disabled = on;
+    document.getElementById('preorder-spinner').style.display    = on ? 'inline-block' : 'none';
+    document.getElementById('preorder-submit-text').textContent  = on ? 'Encrypting & Sending...' : '🔒 Secure Pre-Order';
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PREORDER SUBMIT → GOOGLE APPS SCRIPT
+  ═══════════════════════════════════════════════════════════ */
+  async function submitPreorder() {
+    var name     = document.getElementById('po-name').value.trim();
+    var contact  = document.getElementById('po-contact').value.trim();
+    var date     = document.getElementById('po-date').value;
+    var time     = document.getElementById('po-time').value;
+    var location = document.getElementById('po-location').value.trim();
+
+    if (!name || !contact || !date || !location) {
+      showToast('⚠ Please fill in all fields.', 'amber'); return;
+    }
+
+    var entries = Object.values(cart);
+    var totalPrice = entries.reduce(function(s, e) {
+      return s + (parseFloat((e.price || '0').replace(/[^0-9.]/g,'')) || 0) * e.qty;
+    }, 0);
+
+    var itemsSummary = entries.map(function(e) { return e.qty + 'x ' + e.title + ' (' + e.price + ')'; }).join(', ');
+    var totalStr     = '$' + totalPrice.toFixed(2);
+    var orderId      = 'MX-' + Date.now().toString(36).toUpperCase().slice(-6);
+
+    var payload = {
+      action:          'preorder',
+      orderId:         orderId,
+      passcode:        getSessionPasscode(),
+      customerName:    name,
+      contactInfo:     contact,
+      pickupDate:      date,
+      pickupTime:      time,
+      pickupLocation:  location,
+      itemsSummary:    itemsSummary,
+      totalAmount:     totalStr
+    };
+
+    setPreorderLoading(true);
+
+    try {
+      // no-cors to avoid CORS preflight issues with Apps Script
+      await fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
+        method: 'POST',
+        mode:   'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:   JSON.stringify(payload)
+      });
+    } catch(e) {
+      // no-cors fetch always "succeeds" (opaque response) so this only fires on network error
+      console.warn('Apps Script dispatch note:', e);
+    }
+
+    // Store for success screen
+    lastOrderData = { name, contact, date, time, location, itemsSummary, totalStr, orderId, entries };
+
+    setPreorderLoading(false);
+    showSuccessView(payload, entries, totalStr, orderId);
+  }
+
+  function showSuccessView(payload, entries, totalStr, orderId) {
+    document.getElementById('preorder-form-view').style.display   = 'none';
+    document.getElementById('preorder-success-view').style.display = 'block';
+    document.getElementById('success-order-id').textContent        = orderId;
+
+    var summaryHtml =
+      '<p><span class="text-slate-500">Customer:</span> ' + payload.customerName + '</p>' +
+      '<p><span class="text-slate-500">Contact:</span> '  + payload.contactInfo  + '</p>' +
+      '<p><span class="text-slate-500">Date:</span> '     + payload.pickupDate   + ' &bull; ' + payload.pickupTime + '</p>' +
+      '<p><span class="text-slate-500">Location:</span> ' + payload.pickupLocation + '</p>' +
+      '<div class="pt-2 mt-2" style="border-top:1px solid rgba(255,255,255,0.07);">' +
+      entries.map(function(e) { return '<p>' + e.qty + 'x ' + e.title + ' — ' + e.price + '</p>'; }).join('') +
+      '<p class="mt-1 font-bold" style="color:#22d3ee;">Total: ' + totalStr + '</p>' +
+      '</div>';
+    document.getElementById('success-summary').innerHTML = summaryHtml;
+  }
+
+  function buildChatMessage(d) {
+    var lines = (d.entries || []).map(function(e) { return '\u2022 ' + e.qty + 'x ' + e.title + ' (' + e.price + ' each)'; }).join('\n');
+    return 'New Pre-Order from Midnight Xotixs:\n' +
+      '--------------------------------\n' +
+      'Order ID: ' + d.orderId + '\n' +
+      'Customer: ' + d.name + '\n' +
+      'Contact: '  + d.contact + '\n' +
+      'Date: '     + d.date + ' \u2022 ' + d.time + '\n' +
+      'Location: ' + d.location + '\n' +
+      '--------------------------------\n' +
+      lines + '\n' +
+      '--------------------------------\n' +
+      'Total: ' + d.totalStr;
+  }
+
+  function sendViaChat() {
+    if (!lastOrderData) return;
+    var msg     = buildChatMessage(lastOrderData);
+    var chatUrl = orderChatUrl || '';
+    if (!chatUrl) { showToast('\u26A0\uFE0F No chat URL configured in Sanity.', 'amber'); return; }
+    var finalUrl = chatUrl;
+    if (chatUrl.includes('wa.me') || chatUrl.includes('whatsapp')) {
+      finalUrl = chatUrl.split('?')[0] + '?text=' + encodeURIComponent(msg);
+    } else if (chatUrl.includes('t.me') || chatUrl.includes('telegram')) {
+      finalUrl = chatUrl + '?start=' + encodeURIComponent(msg.substring(0, 64));
+    }
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  function doneAndClose() {
+    cart = {};
+    saveCart();
+    updateCartUI();
+    closePreorderModal();
+    // reset form fields for next order
+    document.getElementById('po-name').value     = '';
+    document.getElementById('po-contact').value  = '';
+    document.getElementById('po-location').value = '';
+    lastOrderData = null;
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -516,10 +780,10 @@
         return;
       }
       grid.innerHTML = products.map(function(p) {
-        return '<div class="bg-white rounded-2xl sm:rounded-3xl p-5 border border-slate-100 shadow-sm hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">' +
+        return '<div class="bg-white rounded-2xl sm:rounded-3xl p-5 border border-slate-100 shadow-sm hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">' +
           '<div>' +
           (p.imageUrl
-            ? '<img src="' + p.imageUrl + '" alt="' + p.title + '" class="w-full h-36 object-cover rounded-xl mb-4 border border-slate-100"/>'
+            ? '<img src="' + p.imageUrl + '" alt="' + escAttr(p.title) + '" class="w-full h-36 object-cover rounded-xl mb-4 border border-slate-100"/>'
             : '<div class="h-36 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#FCE4EC]/50 flex items-center justify-center text-6xl mb-4">🥐</div>') +
           '<div class="space-y-1"><div class="flex items-center justify-between gap-2">' +
           '<h3 class="heading-serif text-lg font-bold text-slate-800 leading-tight">' + p.title + '</h3>' +
@@ -537,12 +801,7 @@
      CHAMBER — LOAD DATA
   ═══════════════════════════════════════════════════════════ */
   async function loadChamber() {
-    if (chamberLoaded) {
-      renderCategoryBar();
-      renderProductSections();
-      updateCartUI();
-      return;
-    }
+    if (chamberLoaded) { renderCategoryBar(); renderProductSections(); updateCartUI(); return; }
     try {
       var results = await Promise.all([
         sanityFetch('*[_type == "category"] | order(priority asc){ _id, title, slug, accentColor }'),
@@ -553,8 +812,8 @@
       allProducts   = results[1] || [];
       if (results[2] && results[2].orderChatUrl) orderChatUrl = results[2].orderChatUrl;
 
-      document.getElementById('chamber-skeleton').style.display   = 'none';
-      document.getElementById('product-sections').style.display   = 'block';
+      document.getElementById('chamber-skeleton').style.display = 'none';
+      document.getElementById('product-sections').style.display = 'block';
 
       chamberLoaded = true;
       renderCategoryBar();
@@ -562,12 +821,12 @@
       updateCartUI();
     } catch(e) {
       console.error('Chamber load:', e);
-      document.getElementById('chamber-skeleton').innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-12">Failed to load products. Refresh to retry.</p>';
+      document.getElementById('chamber-skeleton').innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-12">Failed to load. Refresh to retry.</p>';
     }
   }
 
   /* ═══════════════════════════════════════════════════════════
-     RENDER CATEGORY BAR
+     CATEGORY BAR
   ═══════════════════════════════════════════════════════════ */
   function renderCategoryBar() {
     var bar = document.getElementById('category-bar');
@@ -590,58 +849,46 @@
   function buildPill(id, label, color) {
     var t = color ? theme(color) : null;
     var isActive = activeCategory === id;
-    var style = '';
-    if (isActive && t) {
-      style = 'background:' + t.pillBg + ';color:' + t.text + ';border-color:' + t.border + ';box-shadow:0 0 10px ' + t.glow + ';';
-    } else if (isActive) {
-      style = 'background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.2);';
-    } else {
-      style = 'background:rgba(255,255,255,0.04);color:#64748b;border-color:rgba(255,255,255,0.08);';
-    }
+    var style = isActive && t
+      ? 'background:' + t.pillBg + ';color:' + t.text + ';border-color:' + t.border + ';box-shadow:0 0 10px ' + t.glow + ';'
+      : isActive
+        ? 'background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.2);'
+        : 'background:rgba(255,255,255,0.04);color:#64748b;border-color:rgba(255,255,255,0.08);';
     return '<button class="cat-pill shrink-0 min-h-[36px] px-4 py-1 rounded-full text-xs font-mono font-semibold border transition-all cursor-pointer whitespace-nowrap flex items-center" style="' + style + '" data-catid="' + id + '">' + label + '</button>';
   }
 
   /* ═══════════════════════════════════════════════════════════
-     RENDER PRODUCT SECTIONS
+     PRODUCT SECTIONS
   ═══════════════════════════════════════════════════════════ */
   function renderProductSections() {
     var container = document.getElementById('product-sections');
     var cats = activeCategory === 'all' ? allCategories : allCategories.filter(function(c) { return c._id === activeCategory; });
-
-    if (cats.length === 0) {
-      container.innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-16">No products in this category.</p>';
-      return;
-    }
+    if (!cats.length) { container.innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-16">No products in this category.</p>'; return; }
 
     container.innerHTML = cats.map(function(cat, idx) {
       var products = allProducts.filter(function(p) { return p.categoryId === cat._id; });
-      var t = theme(cat.accentColor);
+      var t   = theme(cat.accentColor);
       var num = String(idx + 1).padStart(2, '0');
       var cardsHtml = products.length === 0
         ? '<p class="text-center text-slate-600 font-mono text-xs py-8">No products yet. Add via Studio.</p>'
         : products.map(function(p) { return buildProductCard(p, t); }).join('');
-
       return '<section id="section-' + cat._id + '" class="space-y-4">' +
         '<div class="flex items-center space-x-3 pb-3 border-b" style="border-color:' + t.border + '20;">' +
         '<div class="w-7 h-7 rounded-lg flex items-center justify-center font-mono font-bold text-xs" style="background:' + t.pillBg + ';color:' + t.text + ';border:1px solid ' + t.border + ';">' + num + '</div>' +
         '<h3 class="font-street text-lg sm:text-xl font-black tracking-wider uppercase" style="color:' + t.sectionHead + ';">' + cat.title + '</h3>' +
         '</div><div class="space-y-3">' + cardsHtml + '</div></section>';
     }).join('');
-
     bindQtyButtons();
   }
 
   /* ═══════════════════════════════════════════════════════════
-     PRODUCT CARD BUILDER
+     PRODUCT CARD
   ═══════════════════════════════════════════════════════════ */
   function buildProductCard(p, t) {
-    var qty = cart[p._id] ? cart[p._id].qty : 0;
+    var qty    = cart[p._id] ? cart[p._id].qty : 0;
     var imgTag = p.imageUrl
-      ? '<img src="' + p.imageUrl + '" alt="' + p.title + '" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shrink-0" style="border:1px solid ' + t.border + '30;"/>'
+      ? '<img src="' + p.imageUrl + '" alt="' + escAttr(p.title) + '" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shrink-0" style="border:1px solid ' + t.border + '30;"/>'
       : '<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-3xl shrink-0" style="background:' + t.pillBg + ';border:1px solid ' + t.border + '30;">⚡</div>';
-
-    var qtyControl = buildQtyControl(p, t, qty);
-
     return '<div id="card-' + p._id + '" class="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-2xl transition-all" style="background:rgba(15,20,32,0.85);border:1px solid ' + t.border + '30;backdrop-filter:blur(12px);">' +
       imgTag +
       '<div class="flex-grow min-w-0 space-y-1">' +
@@ -649,7 +896,7 @@
       '<p class="text-xs text-slate-500 leading-relaxed line-clamp-2">' + (p.description || '') + '</p>' +
       '<div class="flex items-center justify-between pt-1 gap-2">' +
       '<span class="font-mono font-bold text-sm" style="color:' + t.text + ';">' + p.price + '</span>' +
-      '<div class="qty-control" data-pid="' + p._id + '">' + qtyControl + '</div>' +
+      '<div class="qty-control" data-pid="' + p._id + '">' + buildQtyControl(p, t, qty) + '</div>' +
       '</div></div></div>';
   }
 
@@ -665,16 +912,14 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     QTY BUTTON BINDING
+     QTY BUTTONS
   ═══════════════════════════════════════════════════════════ */
   function bindQtyButtons() {
     document.querySelectorAll('.qty-add').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var pid = btn.dataset.pid;
         cart[pid] = { title: btn.dataset.title, price: btn.dataset.price, qty: 1 };
-        saveCart();
-        updateCartUI();
-        refreshCard(pid);
+        saveCart(); updateCartUI(); refreshCard(pid);
       });
     });
     document.querySelectorAll('.qty-inc').forEach(function(btn) {
@@ -682,9 +927,7 @@
         var pid = btn.dataset.pid;
         if (!cart[pid]) cart[pid] = { title: btn.dataset.title, price: btn.dataset.price, qty: 0 };
         cart[pid].qty++;
-        saveCart();
-        updateCartUI();
-        refreshCard(pid);
+        saveCart(); updateCartUI(); refreshCard(pid);
       });
     });
     document.querySelectorAll('.qty-dec').forEach(function(btn) {
@@ -693,9 +936,7 @@
         if (!cart[pid]) return;
         cart[pid].qty--;
         if (cart[pid].qty <= 0) delete cart[pid];
-        saveCart();
-        updateCartUI();
-        refreshCard(pid);
+        saveCart(); updateCartUI(); refreshCard(pid);
       });
     });
   }
@@ -703,59 +944,25 @@
   function refreshCard(pid) {
     var product = allProducts.find(function(p) { return p._id === pid; });
     if (!product) return;
-    var t = theme(product.categoryColor);
+    var t   = theme(product.categoryColor);
     var qty = cart[pid] ? cart[pid].qty : 0;
-    var el = document.querySelector('#card-' + pid + ' .qty-control');
-    if (el) {
-      el.innerHTML = buildQtyControl(product, t, qty);
-      bindQtyButtons();
-    }
+    var el  = document.querySelector('#card-' + pid + ' .qty-control');
+    if (el) { el.innerHTML = buildQtyControl(product, t, qty); bindQtyButtons(); }
   }
 
   /* ═══════════════════════════════════════════════════════════
-     CART UI + FLOATING BAR
+     CART UI
   ═══════════════════════════════════════════════════════════ */
   function updateCartUI() {
-    var entries = Object.values(cart);
-    var totalQty = entries.reduce(function(s, e) { return s + e.qty; }, 0);
+    var entries    = Object.values(cart);
+    var totalQty   = entries.reduce(function(s, e) { return s + e.qty; }, 0);
     var totalPrice = entries.reduce(function(s, e) {
-      var n = parseFloat((e.price || '0').replace(/[^0-9.]/g, '')) || 0;
-      return s + n * e.qty;
+      return s + (parseFloat((e.price || '0').replace(/[^0-9.]/g,'')) || 0) * e.qty;
     }, 0);
-
-    document.getElementById('cart-badge').textContent = totalQty;
-    document.getElementById('cart-summary-text').textContent =
-      totalQty + ' item' + (totalQty !== 1 ? 's' : '') + ' \u2022 $' + totalPrice.toFixed(2);
-
+    document.getElementById('cart-badge').textContent      = totalQty;
+    document.getElementById('cart-summary-text').textContent = totalQty + ' item' + (totalQty !== 1 ? 's' : '') + ' \u2022 $' + totalPrice.toFixed(2);
     var bar = document.getElementById('checkout-bar');
-    if (totalQty > 0) {
-      bar.classList.remove('hidden-bar');
-    } else {
-      bar.classList.add('hidden-bar');
-    }
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     CHAT ORDER DISPATCH
-  ═══════════════════════════════════════════════════════════ */
-  function proceedToChat() {
-    var entries = Object.values(cart);
-    if (entries.length === 0) return;
-    var totalPrice = entries.reduce(function(s, e) {
-      var n = parseFloat((e.price || '0').replace(/[^0-9.]/g, '')) || 0;
-      return s + n * e.qty;
-    }, 0);
-    var lines = entries.map(function(e) { return '\u2022 ' + e.qty + 'x ' + e.title + ' (' + e.price + ' each)'; }).join('\n');
-    var message = 'New Order from Midnight Xotixs:\n--------------------------------\n' + lines + '\n--------------------------------\nTotal: $' + totalPrice.toFixed(2) + '\nDelivery Address: [Please write your address here]';
-    var chatUrl = orderChatUrl || '';
-    if (!chatUrl) { showToast('\u26A0\uFE0F Order chat not configured yet.', 'amber'); return; }
-    var finalUrl = chatUrl;
-    if (chatUrl.includes('wa.me') || chatUrl.includes('whatsapp')) {
-      finalUrl = chatUrl.split('?')[0] + '?text=' + encodeURIComponent(message);
-    } else if (chatUrl.includes('t.me') || chatUrl.includes('telegram')) {
-      finalUrl = chatUrl + '?start=' + encodeURIComponent(message.substring(0, 64));
-    }
-    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+    totalQty > 0 ? bar.classList.remove('hidden-bar') : bar.classList.add('hidden-bar');
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -763,148 +970,106 @@
   ═══════════════════════════════════════════════════════════ */
   function showToast(msg, color) {
     var t = theme(color || 'blue');
-    var container = document.getElementById('toast-container');
+    var c = document.getElementById('toast-container');
     var el = document.createElement('div');
     el.className = 'pointer-events-auto transition-all duration-300 translate-y-4 opacity-0 rounded-xl px-4 py-3 text-xs font-mono max-w-xs';
     el.style.cssText = 'background:rgba(15,20,32,.97);border:1px solid ' + t.border + ';color:' + t.text + ';box-shadow:0 0 16px ' + t.glow + ';';
     el.textContent = msg;
-    container.appendChild(el);
-    requestAnimationFrame(function() { el.classList.remove('translate-y-4', 'opacity-0'); });
-    setTimeout(function() {
-      el.classList.add('translate-y-4', 'opacity-0');
-      setTimeout(function() { el.remove(); }, 300);
-    }, 3000);
+    c.appendChild(el);
+    requestAnimationFrame(function() { el.classList.remove('translate-y-4','opacity-0'); });
+    setTimeout(function() { el.classList.add('translate-y-4','opacity-0'); setTimeout(function() { el.remove(); }, 300); }, 3000);
   }
 
   /* ═══════════════════════════════════════════════════════════
-     ATTR ESCAPER
+     UTILITIES
   ═══════════════════════════════════════════════════════════ */
-  function escAttr(str) {
-    return (str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
+  function escAttr(str) { return (str || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-  /* ═══════════════════════════════════════════════════════════
-     SANITY WRITE — mark passcode used
-  ═══════════════════════════════════════════════════════════ */
   async function markPasscodeUsed(docId) {
     var res = await fetch(
       'https://' + SANITY_PROJECT_ID + '.api.sanity.io/v' + SANITY_API_VERSION + '/data/mutate/' + SANITY_DATASET,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + SANITY_WRITE_TOKEN },
-        body: JSON.stringify({ mutations: [{ patch: { id: docId, set: { isUsed: true } } }] })
-      }
+      { method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+SANITY_WRITE_TOKEN},
+        body: JSON.stringify({ mutations:[{ patch:{ id:docId, set:{ isUsed:true } } }] }) }
     );
     if (!res.ok) throw new Error('Mutate: ' + res.statusText);
   }
 
   /* ═══════════════════════════════════════════════════════════
-     BOOT
+     BOOT — DOMContentLoaded
   ═══════════════════════════════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', function() {
 
-    /* ── Restore cart from localStorage ── */
     cart = loadCart();
 
-    /* ── If already authenticated (set by anti-flicker script), load chamber directly ── */
     if (window.__xotixs_authed) {
       showChamber();
-      loadBakery();  // loads orderChatUrl etc. in background
+      loadBakery();
       loadChamber();
-      return;        // skip binding auth modal events below? No — still bind them for safety
+    } else {
+      showBakery();
+      loadBakery();
     }
 
-    /* ── No valid session — show bakery ── */
-    showBakery();
-    loadBakery();
+    /* ── Auth Modal ── */
+    document.getElementById('open-auth-btn').addEventListener('click', function() { showAuthModal('login'); });
+    var heroBtn = document.getElementById('hero-member-btn');
+    if (heroBtn) heroBtn.addEventListener('click', function() { showAuthModal('login'); });
+    var footerLink = document.getElementById('footer-portal-link');
+    if (footerLink) footerLink.addEventListener('click', function(e) { e.preventDefault(); showAuthModal('login'); });
+    document.getElementById('close-modal-btn').addEventListener('click', hideAuthModal);
+    document.getElementById('auth-modal').addEventListener('click', function(e) { if (e.target === document.getElementById('auth-modal')) hideAuthModal(); });
+    document.getElementById('go-to-register-btn').addEventListener('click', showRegView);
+    document.getElementById('go-to-login-btn').addEventListener('click', showLoginView);
 
-    /* ── DOM refs ── */
-    var openAuthBtn    = document.getElementById('open-auth-btn');
-    var heroMemberBtn  = document.getElementById('hero-member-btn');
-    var footerLink     = document.getElementById('footer-portal-link');
-    var closeModalBtn  = document.getElementById('close-modal-btn');
-    var goToReg        = document.getElementById('go-to-register-btn');
-    var goToLogin      = document.getElementById('go-to-login-btn');
-    var loginForm      = document.getElementById('login-form');
-    var regForm        = document.getElementById('register-form');
-    var regPasscode    = document.getElementById('reg-passcode');
-    var regErrText     = document.getElementById('register-error-text');
-    var relockBtn      = document.getElementById('relock-btn');
-    var proceedBtn     = document.getElementById('proceed-to-chat-btn');
-    var authModal      = document.getElementById('auth-modal');
-
-    /* ── Modal triggers ── */
-    openAuthBtn.addEventListener('click',   function() { showModal('login'); });
-    if (heroMemberBtn) heroMemberBtn.addEventListener('click', function() { showModal('login'); });
-    if (footerLink)    footerLink.addEventListener('click', function(e) { e.preventDefault(); showModal('login'); });
-    closeModalBtn.addEventListener('click', hideModal);
-    authModal.addEventListener('click', function(e) { if (e.target === authModal) hideModal(); });
-    goToReg.addEventListener('click', showRegView);
-    goToLogin.addEventListener('click', showLoginView);
-
-    /* ── Decoy login (always rejects) ── */
-    loginForm.addEventListener('submit', function(e) {
+    document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
       document.getElementById('login-error').style.display = 'flex';
     });
 
-    /* ── Gateway registration ── */
-    regForm.addEventListener('submit', async function(e) {
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
       e.preventDefault();
       document.getElementById('register-error').style.display = 'none';
-      var code = regPasscode.value.trim();
+      var code = document.getElementById('reg-passcode').value.trim();
       if (!code) return;
-      setLoading(true);
-
+      setAuthLoading(true);
       try {
-        var doc = await sanityFetch('*[_type == "passcode" && code == "' + code.replace(/"/g, '\\"') + '"][0]');
-
-        if (!doc) {
-          regErrText.textContent = 'Invalid or expired invitation pass.';
-          document.getElementById('register-error').style.display = 'flex';
-          return;
-        }
-        if (doc.isUsed === true) {
-          regErrText.textContent = 'This pass has already been used.';
-          document.getElementById('register-error').style.display = 'flex';
-          return;
-        }
-
+        var doc = await sanityFetch('*[_type == "passcode" && code == "' + code.replace(/"/g,'\\"') + '"][0]');
+        if (!doc) { document.getElementById('register-error-text').textContent = 'Invalid or expired invitation pass.'; document.getElementById('register-error').style.display='flex'; return; }
+        if (doc.isUsed) { document.getElementById('register-error-text').textContent = 'This pass has already been used.'; document.getElementById('register-error').style.display='flex'; return; }
         await markPasscodeUsed(doc._id);
-
-        /* ── Save persistent session ── */
-        saveSession();
-
-        hideModal();
+        saveSession(code);
+        hideAuthModal();
         showChamber();
         await loadChamber();
-
       } catch(err) {
         console.error(err);
-        regErrText.textContent = err.message || 'Verification failed. Try again.';
+        document.getElementById('register-error-text').textContent = err.message || 'Verification failed.';
         document.getElementById('register-error').style.display = 'flex';
-      } finally {
-        setLoading(false);
-      }
+      } finally { setAuthLoading(false); }
     });
 
-    /* ── Exit & Lock ── */
-    relockBtn.addEventListener('click', function() {
-      clearSession();
-      cart = {};
-      updateCartUI();
-      chamberLoaded = false;
-      resetForms();
-      showBakery();
-      /* reset skeleton for next load */
+    /* ── Relock ── */
+    document.getElementById('relock-btn').addEventListener('click', function() {
+      clearSession(); cart = {}; updateCartUI(); chamberLoaded = false; resetAuthForms();
       document.getElementById('chamber-skeleton').style.display = 'block';
       document.getElementById('product-sections').style.display = 'none';
+      showBakery();
     });
 
-    /* ── Checkout ── */
-    if (proceedBtn) proceedBtn.addEventListener('click', proceedToChat);
+    /* ── Pre-order Modal ── */
+    document.getElementById('open-preorder-btn').addEventListener('click', openPreorderModal);
 
-    /* ── If session was valid, bindings above still needed for relock etc. ── */
+    document.getElementById('close-preorder-btn').addEventListener('click', closePreorderModal);
+
+    document.getElementById('preorder-modal').addEventListener('click', function(e) {
+      if (e.target === document.getElementById('preorder-modal')) closePreorderModal();
+    });
+
+    document.getElementById('preorder-submit-btn').addEventListener('click', submitPreorder);
+
+    document.getElementById('success-chat-btn').addEventListener('click', sendViaChat);
+
+    document.getElementById('success-done-btn').addEventListener('click', doneAndClose);
   });
 </script>
 </body>
