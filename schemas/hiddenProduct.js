@@ -22,6 +22,7 @@ export default defineType({
       name: 'price',
       title: 'Price',
       type: 'string',
+      description: 'e.g. $45.00',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -33,15 +34,8 @@ export default defineType({
     defineField({
       name: 'category',
       title: 'Category',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'NICK Division (Red)', value: 'nick'},
-          {title: 'PENS Hardware (Blue)', value: 'pens'},
-          {title: 'TREATS Infusions (Green)', value: 'treats'},
-        ],
-        layout: 'radio',
-      },
+      type: 'reference',
+      to: [{type: 'category'}],
       validation: (Rule) => Rule.required(),
     }),
   ],

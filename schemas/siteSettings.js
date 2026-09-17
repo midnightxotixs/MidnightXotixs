@@ -30,5 +30,11 @@ export default defineType({
       type: 'text',
       rows: 3,
     }),
+    defineField({
+      name: 'orderChatUrl',
+      title: 'Order Chat URL',
+      type: 'string',
+      description: 'WhatsApp direct link (e.g., https://wa.me/123456789) or Telegram username link (e.g., https://t.me/username)',
+    }),
   ],
 })
