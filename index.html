@@ -148,6 +148,7 @@
     (function() {
       var pathname = window.location.pathname;
       var isDeveloperRoute = pathname.includes('/developer');
+      var isProfileRoute   = pathname.includes('/profile');
       var isSecretRoute    = pathname.includes('/secret-menu');
 
       if (isDeveloperRoute) {
@@ -155,11 +156,30 @@
           var b = document.getElementById('bakery-ui');
           var h = document.getElementById('hidden-chamber');
           var d = document.getElementById('developer-ui');
+          var p = document.getElementById('profile-ui');
           if (b) b.style.display = 'none';
           if (h) h.style.display = 'none';
+          if (p) p.style.display = 'none';
           if (d) {
             d.style.display = 'flex';
             d.style.flexDirection = 'column';
+          }
+        });
+        return;
+      }
+
+      if (isProfileRoute) {
+        document.addEventListener('DOMContentLoaded', function() {
+          var b = document.getElementById('bakery-ui');
+          var h = document.getElementById('hidden-chamber');
+          var d = document.getElementById('developer-ui');
+          var p = document.getElementById('profile-ui');
+          if (b) b.style.display = 'none';
+          if (h) h.style.display = 'none';
+          if (d) d.style.display = 'none';
+          if (p) {
+            p.style.display = 'flex';
+            p.style.flexDirection = 'column';
           }
         });
         return;
@@ -291,14 +311,10 @@
           <span>Sign In</span>
         </button>
 
-        <!-- Logged-in Avatar Button (Opens Slide-Out Profile Drawer) -->
-        <button id="nav-user-btn" class="hidden items-center space-x-2 p-1.5 pr-3 rounded-full bg-white hover:bg-stone-100 border border-stone-200/80 shadow-xs transition-all active:scale-95 cursor-pointer" aria-label="Open Patron Profile">
-          <div id="nav-user-avatar" class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-600 to-rose-600 text-white text-[11px] font-mono font-bold flex items-center justify-center uppercase">
-            MT
-          </div>
-          <span id="nav-user-name" class="text-xs font-semibold text-stone-800 max-w-[90px] truncate hidden xs:inline">
-            Patron
-          </span>
+        <!-- Logged-in Button (Displays strictly "My Account" with user icon) -->
+        <button id="nav-user-btn" class="hidden items-center space-x-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-stone-100 border border-stone-200/80 text-stone-800 text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer" aria-label="Open My Account">
+          <span>👤</span>
+          <span id="nav-user-label">My Account</span>
         </button>
 
         <!-- Main Cart Trigger Button -->
@@ -556,10 +572,10 @@
       <span class="text-[10px] font-bold uppercase tracking-wider">Cart</span>
     </button>
 
-    <!-- Tab 4: My Account -->
-    <button onclick="openProfileDrawer()" class="flex flex-col items-center space-y-1 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer" aria-label="Open My Account">
+    <!-- Tab 4: My Account / Sign In -->
+    <button id="mobile-tab-account" onclick="handleAccountAction()" class="flex flex-col items-center space-y-1 text-stone-600 hover:text-stone-900 transition-colors cursor-pointer" aria-label="Account">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-      <span class="text-[10px] font-bold uppercase tracking-wider">My Account</span>
+      <span id="mobile-tab-account-text" class="text-[10px] font-bold uppercase tracking-wider">Account</span>
     </button>
 
   </nav>
@@ -590,14 +606,10 @@
     <a href="#catalog-section" class="mobile-nav-link block py-2 hover:text-amber-900 border-b border-stone-200/60">All Products</a>
     <a href="#pan-dulce-section" class="mobile-nav-link block py-2 hover:text-amber-900 border-b border-stone-200/60">Fresh Artisan Breads</a>
     <a href="#pasteles-section" class="mobile-nav-link block py-2 hover:text-amber-900 border-b border-stone-200/60">Pastries &amp; Cakes</a>
-    <button onclick="closeMobileMenu(); openProfileDrawer();" class="w-full flex items-center space-x-2 py-2 hover:text-amber-900 border-b border-stone-200/60 text-left cursor-pointer transition-colors">
-      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-      <span>Profile</span>
-    </button>
-    
     <div class="pt-4 space-y-2">
-      <button onclick="closeMobileMenu(); openProfileDrawer();" class="w-full py-2.5 px-4 rounded-xl bg-stone-900 text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer">
-        My Account / Sign In
+      <button id="mobile-menu-auth-btn" onclick="handleMobileAuthClick()" class="w-full py-2.5 px-4 rounded-xl bg-stone-900 text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer flex items-center justify-center space-x-2">
+        <span>👤</span>
+        <span id="mobile-menu-auth-text">Sign In</span>
       </button>
       <button onclick="closeMobileMenu(); openBakeryCartDrawer();" class="w-full py-2.5 px-4 rounded-xl bg-amber-800 text-white text-xs font-bold uppercase tracking-wider text-center cursor-pointer">
         View Shopping Cart 🛒
@@ -723,199 +735,7 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════════════════════ -->
-<!-- SLIDE-OUT PROFILE DRAWER (Baker's Club — Artisanal)        -->
-<!-- ══════════════════════════════════════════════════════════ -->
-<div id="drawer-backdrop" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none"></div>
 
-<aside id="profile-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-[#FAF7F2] shadow-2xl flex flex-col transition-transform duration-300 ease-out transform translate-x-full overflow-hidden" aria-label="Baker's Club Profile">
-
-  <!-- Drawer Header -->
-  <div class="px-5 py-4 sm:px-6 border-b border-stone-200 flex items-center justify-between bg-white">
-    <div class="flex items-center space-x-2.5">
-      <div class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-base">🥐</div>
-      <span class="heading-serif font-bold text-base text-stone-900">Baker's Club Profile</span>
-    </div>
-    <button id="close-drawer-btn" class="min-w-[48px] min-h-[48px] rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center transition-colors active:scale-95 cursor-pointer" aria-label="Close Profile">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
-  </div>
-
-  <!-- Drawer Scrollable Body -->
-  <div class="flex-1 overflow-y-auto no-scrollbar">
-
-    <!-- ① User Info Card -->
-    <div class="p-5 bg-white border-b border-stone-200">
-      <div class="flex items-center space-x-3.5">
-        <div id="drawer-user-avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-600 to-rose-500 text-white font-black text-lg flex items-center justify-center shadow-md uppercase font-mono shrink-0">
-          MT
-        </div>
-        <div class="min-w-0 flex-1">
-          <div class="flex items-center flex-wrap gap-1.5">
-            <h3 id="drawer-user-name" class="heading-serif font-bold text-stone-900 text-base leading-tight truncate">Patron Member</h3>
-            <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
-              <span>☕</span>
-              <span>Midnight Connoisseur</span>
-            </span>
-          </div>
-          <p id="drawer-user-email" class="text-xs text-stone-400 mt-1 font-mono truncate">patron@midnightxotixs.com</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ② Order Tracking Status -->
-    <div class="p-5 border-b border-stone-200 bg-white space-y-4">
-      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 font-mono">Active Order Status</p>
-      <div class="space-y-0">
-        <!-- Step 1: Done -->
-        <div class="flex items-start space-x-3">
-          <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
-          </div>
-          <div class="pb-6">
-            <p class="text-xs font-bold text-stone-900">Order Placed</p>
-            <p class="text-[10px] text-emerald-600 font-semibold mt-0.5">Confirmed ✓</p>
-          </div>
-        </div>
-        <!-- Step 2: Active -->
-        <div class="flex items-start space-x-3">
-          <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full bg-amber-100 border-2 border-amber-500 flex items-center justify-center shrink-0 animate-pulse">
-              <span class="text-sm">🔥</span>
-            </div>
-            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
-          </div>
-          <div class="pb-6">
-            <p class="text-xs font-bold text-stone-900">In the Oven / Baking</p>
-            <p class="text-[10px] text-amber-700 font-semibold mt-0.5">Active — Baking Now</p>
-          </div>
-        </div>
-        <!-- Step 3: Pending -->
-        <div class="flex items-start space-x-3">
-          <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full bg-stone-100 border-2 border-stone-300 flex items-center justify-center shrink-0">
-              <span class="text-sm">📦</span>
-            </div>
-            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
-          </div>
-          <div class="pb-6">
-            <p class="text-xs font-bold text-stone-500">Quality Packaging</p>
-            <p class="text-[10px] text-stone-400 mt-0.5">Pending</p>
-          </div>
-        </div>
-        <!-- Step 4: Pending -->
-        <div class="flex items-start space-x-3">
-          <div class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full bg-stone-100 border-2 border-stone-300 flex items-center justify-center shrink-0">
-              <span class="text-sm">🚚</span>
-            </div>
-          </div>
-          <div>
-            <p class="text-xs font-bold text-stone-500">Out for Delivery</p>
-            <p class="text-[10px] text-stone-400 mt-0.5">Pending</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ③ Quick Bakery Options -->
-    <div class="p-5 border-b border-stone-200 bg-white space-y-1">
-      <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 font-mono mb-2">Quick Options</p>
-
-      <button id="drawer-orders-menu-btn" class="w-full min-h-[52px] flex items-center justify-between px-4 py-3 rounded-xl hover:bg-stone-50 border border-stone-200/80 text-stone-700 transition-all text-left group cursor-pointer">
-        <div class="flex items-center space-x-3">
-          <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-base shrink-0">📦</span>
-          <div>
-            <p class="text-xs font-semibold text-stone-800">Saved Delivery Addresses</p>
-            <p id="drawer-recent-orders-hint" class="text-[10px] text-stone-400">Manage your doorstep locations</p>
-          </div>
-        </div>
-        <span class="text-stone-300 group-hover:text-stone-600 group-hover:translate-x-0.5 transition-all text-lg">&rsaquo;</span>
-      </button>
-
-      <button class="w-full min-h-[52px] flex items-center justify-between px-4 py-3 rounded-xl hover:bg-stone-50 border border-stone-200/80 text-stone-700 transition-all text-left group cursor-pointer mt-2">
-        <div class="flex items-center space-x-3">
-          <span class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base shrink-0">❤️</span>
-          <div>
-            <p class="text-xs font-semibold text-stone-800">Favourite Pastries</p>
-            <p class="text-[10px] text-stone-400">Your curated wishlist &amp; saves</p>
-          </div>
-        </div>
-        <span class="text-stone-300 group-hover:text-stone-600 group-hover:translate-x-0.5 transition-all text-lg">&rsaquo;</span>
-      </button>
-    </div>
-
-    <!-- ④ Recent Orders Box (Toggle) -->
-    <div id="drawer-recent-orders-box" class="px-5 py-4 border-b border-stone-200 bg-[#FAF7F2] space-y-2.5" style="display:none;">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-bold text-stone-700">Recent Purchase History</span>
-        <button id="hide-drawer-orders-btn" class="text-[10px] text-stone-400 hover:text-stone-600 underline cursor-pointer">Close</button>
-      </div>
-      <div id="drawer-orders-list" class="space-y-2 text-xs"></div>
-    </div>
-
-    <!-- ⑤ THE TROJAN HORSE SECRET GATEWAY: Refer a Friend -->
-    <div class="p-5 bg-[#FAF7F2]">
-      <div class="rounded-2xl bg-white border border-stone-200 shadow-sm overflow-hidden">
-        <!-- Card Header -->
-        <div class="px-5 pt-5 pb-4 border-b border-stone-100">
-          <div class="flex items-center space-x-2 mb-1.5">
-            <span class="text-xl">🎁</span>
-            <h4 class="heading-serif font-bold text-stone-900 text-base">Refer a Friend &amp; Unlock Secret Tasting</h4>
-          </div>
-          <p class="text-xs text-stone-500 leading-relaxed">Have an exclusive referral or invite token from our head baker? Enter it below to unlock a hidden tasting experience.</p>
-        </div>
-
-        <!-- Referral Form -->
-        <div class="px-5 py-4 space-y-3">
-          <div id="drawer-passcode-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2" style="display:none;">
-            <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <span id="drawer-passcode-error-text">Invalid or expired referral code. Please try again.</span>
-          </div>
-
-          <form id="drawer-passcode-form" class="space-y-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1.5">Referral / Invite Code</label>
-              <input
-                type="text"
-                id="drawer-passcode-input"
-                autocomplete="off"
-                placeholder="Enter Referral / Invite Code"
-                class="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50/60 text-stone-800 text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400 transition-all min-h-[48px]"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              id="drawer-unlock-btn"
-              class="w-full min-h-[48px] py-3 px-5 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] flex items-center justify-center space-x-2 shadow-md cursor-pointer"
-              style="background: linear-gradient(135deg, #C86D51 0%, #A0522D 100%);"
-            >
-              <svg id="drawer-unlock-spinner" class="cyber-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" style="display:none;">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-              </svg>
-              <span id="drawer-unlock-btn-text">Apply Referral</span>
-            </button>
-          </form>
-
-          <p class="text-[10px] text-stone-400 text-center leading-relaxed">Referral codes are issued exclusively by our Head Baker. Each code is single-use and time-limited.</p>
-        </div>
-      </div>
-
-      <!-- Sign Out -->
-      <div class="pt-4">
-        <button id="drawer-logout-btn" class="w-full py-3 text-center text-xs text-stone-400 hover:text-stone-700 font-semibold cursor-pointer transition-colors">
-          Sign out of account
-        </button>
-      </div>
-    </div>
-
-  </div>
-</aside>
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
@@ -1335,6 +1155,265 @@
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
+<!-- VAULT PRODUCT DETAILS MODAL (High-Tech Dark Glassmorphism)  -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="vault-product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" style="display:none;">
+  <div class="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl relative max-h-[92vh] overflow-y-auto border border-cyan-500/25 modal-anim" style="background: rgba(13, 18, 32, 0.97); box-shadow: 0 0 50px rgba(34, 211, 238, 0.12), 0 25px 50px -12px rgba(0, 0, 0, 0.85);">
+    
+    <!-- Close Button -->
+    <button id="close-vault-pdetail-btn" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-700/80 border border-slate-700 transition-colors cursor-pointer" aria-label="Close Product Modal">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+
+    <div class="p-6 sm:p-8 space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+        <!-- High-Res Product Image -->
+        <div class="sm:col-span-5 flex justify-center">
+          <div id="vault-pdetail-img-container" class="w-full max-w-[240px] aspect-square rounded-2xl overflow-hidden flex items-center justify-center shadow-lg relative bg-slate-900 border border-slate-800">
+            <!-- inserted dynamically -->
+          </div>
+        </div>
+
+        <!-- Main Info -->
+        <div class="sm:col-span-7 space-y-3">
+          <div class="flex items-center space-x-2">
+            <span id="vault-pdetail-cat" class="text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-cyan-300 bg-cyan-950/60 border border-cyan-500/30">VIP RESERVE</span>
+          </div>
+          <h2 id="vault-pdetail-title" class="font-street text-xl sm:text-2xl font-black leading-tight text-white"></h2>
+          <div class="flex items-baseline space-x-2">
+            <span id="vault-pdetail-price" class="text-xl sm:text-2xl font-mono font-black text-cyan-400"></span>
+          </div>
+          <p id="vault-pdetail-desc" class="text-xs sm:text-sm leading-relaxed text-slate-300 font-sans"></p>
+          
+          <!-- Stepper & Add to Bag in Modal -->
+          <div class="pt-4 border-t border-slate-800 flex items-center space-x-3">
+            <div id="vault-pdetail-action-container" class="flex-1">
+              <!-- Dynamically rendered + Add to Bag or [ - qty + ] stepper -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Stash / Related Drops -->
+      <div class="pt-5 border-t border-slate-800/80 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Suggested Stash / Related Drops</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          </div>
+        </div>
+        <div id="vault-pdetail-suggested-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <!-- Populated dynamically with items from same category -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- FULL-PAGE ARTISANAL PROFILE VIEW (/profile)                -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="profile-ui" class="w-full min-h-screen bg-[#FAF7F2] flex-col" style="display:none;">
+  
+  <!-- Profile Top Bar -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200 shadow-xs">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <button id="profile-back-btn" class="inline-flex items-center space-x-2 px-3.5 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>← Back to Bakery</span>
+      </button>
+
+      <div class="flex items-center space-x-2">
+        <span class="text-xl">🥐</span>
+        <span class="heading-serif font-black text-stone-900 text-sm sm:text-base">Baker's Club</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Profile Main Container -->
+  <main class="max-w-2xl mx-auto px-4 py-8 w-full space-y-6">
+    
+    <!-- User Info Card -->
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 sm:p-8">
+      <div class="flex items-center space-x-4">
+        <div id="drawer-user-avatar" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-600 to-rose-500 text-white font-black text-xl flex items-center justify-center shadow-md uppercase font-mono shrink-0">
+          MT
+        </div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center flex-wrap gap-2">
+            <h2 id="drawer-user-name" class="heading-serif font-bold text-stone-900 text-lg sm:text-xl leading-tight truncate">Patron Member</h2>
+            <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
+              <span>☕</span>
+              <span>Midnight Connoisseur</span>
+            </span>
+          </div>
+          <p id="drawer-user-email" class="text-xs sm:text-sm text-stone-400 mt-1 font-mono truncate">patron@midnightxotixs.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Order Status Timeline Card -->
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 sm:p-8 space-y-5">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+        <p class="text-xs font-bold uppercase tracking-widest text-stone-400 font-mono">Active Order Status</p>
+        <span class="text-[11px] font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold">Live Kitchen Tracking</span>
+      </div>
+      
+      <div class="space-y-0 pl-1">
+        <!-- Step 1: Done -->
+        <div class="flex items-start space-x-4">
+          <div class="flex flex-col items-center">
+            <div class="w-9 h-9 rounded-full bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
+          </div>
+          <div class="pb-6">
+            <p class="text-xs sm:text-sm font-bold text-stone-900">Order Placed</p>
+            <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">Confirmed ✓</p>
+          </div>
+        </div>
+        <!-- Step 2: Active -->
+        <div class="flex items-start space-x-4">
+          <div class="flex flex-col items-center">
+            <div class="w-9 h-9 rounded-full bg-amber-100 border-2 border-amber-500 flex items-center justify-center shrink-0 animate-pulse">
+              <span class="text-base">🔥</span>
+            </div>
+            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
+          </div>
+          <div class="pb-6">
+            <p class="text-xs sm:text-sm font-bold text-stone-900">In the Oven / Baking</p>
+            <p class="text-[11px] text-amber-700 font-semibold mt-0.5">Active — Baking Now in Hearth</p>
+          </div>
+        </div>
+        <!-- Step 3: Pending -->
+        <div class="flex items-start space-x-4">
+          <div class="flex flex-col items-center">
+            <div class="w-9 h-9 rounded-full bg-stone-100 border-2 border-stone-300 flex items-center justify-center shrink-0">
+              <span class="text-sm">📦</span>
+            </div>
+            <div class="w-0.5 h-8 bg-stone-200 mt-1"></div>
+          </div>
+          <div class="pb-6">
+            <p class="text-xs sm:text-sm font-bold text-stone-500">Quality Packaging</p>
+            <p class="text-[11px] text-stone-400 mt-0.5">Pending</p>
+          </div>
+        </div>
+        <!-- Step 4: Pending -->
+        <div class="flex items-start space-x-4">
+          <div class="flex flex-col items-center">
+            <div class="w-9 h-9 rounded-full bg-stone-100 border-2 border-stone-300 flex items-center justify-center shrink-0">
+              <span class="text-sm">🚚</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs sm:text-sm font-bold text-stone-500">Out for Delivery</p>
+            <p class="text-[11px] text-stone-400 mt-0.5">Pending Doorstep Drop</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Options Card -->
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-sm p-6 sm:p-8 space-y-3">
+      <p class="text-xs font-bold uppercase tracking-widest text-stone-400 font-mono mb-2">Quick Options</p>
+
+      <button id="drawer-orders-menu-btn" class="w-full min-h-[56px] flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-stone-50 border border-stone-200/80 text-stone-700 transition-all text-left group cursor-pointer">
+        <div class="flex items-center space-x-3.5">
+          <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg shrink-0">📦</span>
+          <div>
+            <p class="text-xs sm:text-sm font-semibold text-stone-800">Saved Delivery Addresses</p>
+            <p id="drawer-recent-orders-hint" class="text-[11px] text-stone-400">Manage your doorstep locations</p>
+          </div>
+        </div>
+        <span class="text-stone-300 group-hover:text-stone-600 group-hover:translate-x-0.5 transition-all text-xl">&rsaquo;</span>
+      </button>
+
+      <button class="w-full min-h-[56px] flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-stone-50 border border-stone-200/80 text-stone-700 transition-all text-left group cursor-pointer">
+        <div class="flex items-center space-x-3.5">
+          <span class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg shrink-0">❤️</span>
+          <div>
+            <p class="text-xs sm:text-sm font-semibold text-stone-800">Favourite Pastries</p>
+            <p class="text-[11px] text-stone-400">Your curated wishlist &amp; saves</p>
+          </div>
+        </div>
+        <span class="text-stone-300 group-hover:text-stone-600 group-hover:translate-x-0.5 transition-all text-xl">&rsaquo;</span>
+      </button>
+
+      <!-- Recent Orders Toggle Container -->
+      <div id="drawer-recent-orders-box" class="p-4 rounded-2xl bg-[#FAF7F2] border border-stone-200 space-y-3" style="display:none;">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-stone-700">Recent Purchase History</span>
+          <button id="hide-drawer-orders-btn" class="text-[11px] text-stone-400 hover:text-stone-600 underline cursor-pointer">Close</button>
+        </div>
+        <div id="drawer-orders-list" class="space-y-2 text-xs"></div>
+      </div>
+    </div>
+
+    <!-- THE TROJAN HORSE SECRET GATEWAY: Refer a Friend -->
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-sm overflow-hidden">
+      <div class="p-6 sm:p-8 border-b border-stone-100">
+        <div class="flex items-center space-x-2.5 mb-2">
+          <span class="text-2xl">🎁</span>
+          <h3 class="heading-serif font-bold text-stone-900 text-lg sm:text-xl">Refer a Friend &amp; Unlock Secret Tasting</h3>
+        </div>
+        <p class="text-xs sm:text-sm text-stone-500 leading-relaxed">
+          Have an exclusive referral or invite token from our head baker? Enter it below to unlock a hidden tasting experience.
+        </p>
+      </div>
+
+      <div class="p-6 sm:p-8 space-y-4 bg-stone-50/40">
+        <div id="drawer-passcode-error" class="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2.5" style="display:none;">
+          <svg class="w-4 h-4 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <span id="drawer-passcode-error-text">Invalid or expired referral code. Please try again.</span>
+        </div>
+
+        <form id="drawer-passcode-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-stone-700 mb-2">Referral / Invite Code</label>
+            <input
+              type="text"
+              id="drawer-passcode-input"
+              autocomplete="off"
+              placeholder="Enter Referral / Invite Code"
+              class="w-full px-4 py-3.5 rounded-2xl border border-stone-200 bg-white text-stone-800 text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400 transition-all min-h-[48px]"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            id="drawer-unlock-btn"
+            class="w-full min-h-[50px] py-3.5 px-5 rounded-2xl font-bold text-sm text-white transition-all active:scale-[0.98] flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+            style="background: linear-gradient(135deg, #C86D51 0%, #A0522D 100%);"
+          >
+            <svg id="drawer-unlock-spinner" class="cyber-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" style="display:none;">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span id="drawer-unlock-btn-text">Apply Referral</span>
+          </button>
+        </form>
+
+        <p class="text-[11px] text-stone-400 text-center leading-relaxed">
+          Referral codes are issued exclusively by our Head Baker. Each code is single-use and time-limited.
+        </p>
+      </div>
+    </div>
+
+    <!-- Sign Out Button -->
+    <div class="pt-2 pb-8 text-center">
+      <button id="drawer-logout-btn" class="px-6 py-3 text-xs sm:text-sm text-stone-400 hover:text-stone-700 font-semibold cursor-pointer transition-colors border border-stone-200 rounded-full hover:bg-stone-100">
+        Sign out of account
+      </button>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
 <!-- 7. DEVELOPER CREDITS & ARCHITECTURE VIEW (/developer)      -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <div id="developer-ui" class="w-full relative min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden" style="background-color:#080B10; display:none;">
@@ -1353,110 +1432,64 @@
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex-1 flex flex-col justify-center w-full">
     
-    <div class="text-center max-w-4xl mx-auto mb-10 sm:mb-14">
-      <h1 class="font-street text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight whitespace-normal sm:whitespace-nowrap">
-        System Architects &amp; <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Engineering</span>
+    <!-- Responsive Header Section -->
+    <div class="w-full max-w-3xl mx-auto px-4 text-center mb-10 sm:mb-14">
+      <h1 class="font-street text-2xl sm:text-4xl font-extrabold tracking-tight text-white break-words">
+        System Architecture &amp; <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Engineering</span>
       </h1>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto w-full">
-      
-      <!-- CARD 1: Md Tarikuzzaman Sabbir -->
-      <div class="rounded-3xl bg-slate-900/80 border border-slate-800/90 p-6 sm:p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 shadow-2xl hover:shadow-blue-500/10">
-        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all"></div>
-        
-        <div>
-          <div class="flex items-start justify-between gap-4 mb-6">
-            <div class="space-y-1">
-              <span class="inline-block font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-950/60 border border-blue-500/30 px-2.5 py-1 rounded-md">
-                Concept &amp; UX Strategy
-              </span>
-              <h2 class="text-xl sm:text-2xl font-black text-white pt-1">Md Tarikuzzaman Sabbir</h2>
-              <p class="text-xs sm:text-sm font-semibold text-blue-300/90 font-mono">Lead System Strategist &amp; Concept Architect</p>
-            </div>
-            <div class="relative w-16 h-16 shrink-0">
-              <img src="./assets/sabbir.jpg" alt="Md Tarikuzzaman Sabbir" class="w-16 h-16 rounded-full object-cover border-2 border-slate-700 shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
-              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 items-center justify-center text-white text-xl font-mono font-bold shadow-lg shadow-blue-500/20 border-2 border-blue-400/40" style="display:none;">
-                TS
-              </div>
-            </div>
-          </div>
-
-          <div class="h-px w-full bg-slate-800/80 mb-5"></div>
-
-          <div class="space-y-3 mb-8">
-            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-bold">Key Architectural Contributions:</p>
-            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300">
-              <li class="flex items-start space-x-2.5">
-                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
-                <span>End-to-end concept formulation &amp; dual-tier decoy flow ideation</span>
-              </li>
-              <li class="flex items-start space-x-2.5">
-                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
-                <span>UX/UI architecture &amp; feature planning (Quick-Commerce, Decoy Vault, Pre-orders)</span>
-              </li>
-              <li class="flex items-start space-x-2.5">
-                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
-                <span>Strategic workflow optimization</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <a href="https://www.facebook.com/tarikuzzaman.sabbir.01" target="_blank" rel="noopener noreferrer" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-center space-x-2.5 shadow-lg shadow-blue-600/25 border border-blue-400/30 transition-all active:scale-[0.98] cursor-pointer">
-          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          <span>Connect with Tarikuzzaman ➜</span>
-        </a>
-      </div>
-
-      <!-- CARD 2: Tanvir Kabir -->
+    <!-- Single Centered Showcase Card -->
+    <div class="max-w-xl mx-auto w-full px-4">
       <div class="rounded-3xl bg-slate-900/80 border border-slate-800/90 p-6 sm:p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/10">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all"></div>
         
         <div>
-          <div class="flex items-start justify-between gap-4 mb-6">
-            <div class="space-y-1">
-              <span class="inline-block font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-md">
-                Full-Stack &amp; Automation
-              </span>
-              <h2 class="text-xl sm:text-2xl font-black text-white pt-1">Tanvir Kabir</h2>
-              <p class="text-xs sm:text-sm font-semibold text-cyan-300/90 font-mono">Lead Full-Stack Software Engineer</p>
-            </div>
-            <div class="relative w-16 h-16 shrink-0">
-              <img src="./assets/tanvir.jpg" alt="Tanvir Kabir" class="w-16 h-16 rounded-full object-cover border-2 border-slate-700 shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
-              <div class="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-600 items-center justify-center text-slate-950 text-xl font-mono font-black shadow-lg shadow-cyan-500/20 border-2 border-cyan-300/50" style="display:none;">
+          <div class="text-center mb-6">
+            <div class="relative w-24 h-24 mx-auto mb-4">
+              <img src="./assets/tanvir.jpg" alt="Tanvir Kabir" class="w-24 h-24 rounded-full object-cover border-2 border-cyan-500 shadow-lg mx-auto mb-4" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+              <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-emerald-600 items-center justify-center text-slate-950 text-2xl font-mono font-black shadow-lg shadow-cyan-500/20 border-2 border-cyan-300/50 mx-auto mb-4" style="display:none;">
                 TK
               </div>
             </div>
+            
+            <span class="inline-block font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-3 py-1 rounded-full mb-2">
+              Lead Architect &amp; Engineering
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white">Tanvir Kabir</h2>
+            <p class="text-xs sm:text-sm font-semibold text-cyan-300 font-mono mt-1">Lead Full-Stack Architect, UI/UX Designer &amp; Automation Engineer</p>
           </div>
 
           <div class="h-px w-full bg-slate-800/80 mb-5"></div>
 
           <div class="space-y-3 mb-8">
-            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-bold">Key Architectural Contributions:</p>
-            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-bold">Architectural Scope &amp; Engineering:</p>
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
               <li class="flex items-start space-x-2.5">
                 <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
-                <span>Frontend engineering (Responsive Mobile-First UI, Parabolic Fly-to-Cart animations, SPA History routing)</span>
+                <span><strong>End-to-End Creative Design:</strong> Artisanal visual identity, responsive typography, and mobile-first storefront UX.</span>
               </li>
               <li class="flex items-start space-x-2.5">
                 <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
-                <span>Headless CMS architecture &amp; custom schema modeling via Sanity.io</span>
+                <span><strong>Mobile-First SPA Architecture:</strong> Client-side History routing (`/`, `/profile`, `/secret-menu`, `/developer`) and reactive cart drawers.</span>
               </li>
               <li class="flex items-start space-x-2.5">
                 <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
-                <span>Backend automation, Webhooks &amp; Google Sheets CRM engine</span>
+                <span><strong>Custom Headless Sanity CMS Integration:</strong> Schema modeling, live GROQ querying, and cryptographic passcode token mutations.</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
+                <span><strong>Real-Time Google Sheets CRM &amp; Security Automation:</strong> Automated dual-tier Cash on Delivery order dispatcher and secure session management.</span>
               </li>
             </ul>
           </div>
         </div>
 
-        <a href="https://about.me/tanvir-kabir" target="_blank" rel="noopener noreferrer" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2.5 shadow-lg shadow-cyan-500/25 border border-cyan-300/40 transition-all active:scale-[0.98] cursor-pointer">
+        <a href="https://about.me/tanvir-kabir" target="_blank" rel="noopener noreferrer" class="w-full min-h-[50px] px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2.5 shadow-lg shadow-cyan-500/25 border border-cyan-300/40 transition-all active:scale-[0.98] cursor-pointer">
           <svg class="w-4 h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
           <span>Connect with Tanvir ➜</span>
         </a>
       </div>
-
     </div>
 
   </main>
@@ -2449,6 +2482,32 @@
     renderUserUI();
   }
 
+  function openAuthModal() {
+    var modal = document.getElementById('auth-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeAuthModal() {
+    var modal = document.getElementById('auth-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleAccountAction() {
+    var user = getBakeryUser();
+    if (user && user.loggedIn) {
+      window.history.pushState(null, '', '/profile');
+      showProfile();
+    } else {
+      openAuthModal();
+    }
+  }
+
+  function handleMobileAuthClick() {
+    closeMobileMenu();
+    handleAccountAction();
+  }
+
+
   function getInitials(name) {
     if (!name) return 'MT';
     var parts = name.trim().split(/\s+/);
@@ -2460,17 +2519,21 @@
     var user = getBakeryUser();
     var openAuthBtn = document.getElementById('open-auth-btn');
     var navUserBtn  = document.getElementById('nav-user-btn');
+    var mobileAuthBtn = document.getElementById('mobile-menu-auth-btn');
+    var mobileAuthText = document.getElementById('mobile-menu-auth-text');
+    var mobileTabAccountText = document.getElementById('mobile-tab-account-text');
 
     if (user && user.loggedIn) {
       if (openAuthBtn) openAuthBtn.style.display = 'none';
-      if (navUserBtn)  navUserBtn.style.display  = 'flex';
+      if (navUserBtn) {
+        navUserBtn.style.display = 'inline-flex';
+        var navLabel = document.getElementById('nav-user-label');
+        if (navLabel) navLabel.textContent = 'My Account';
+      }
+      if (mobileAuthText) mobileAuthText.textContent = 'My Account';
+      if (mobileTabAccountText) mobileTabAccountText.textContent = 'Account';
 
       var initials = getInitials(user.name);
-      var navAvatar = document.getElementById('nav-user-avatar');
-      var navName   = document.getElementById('nav-user-name');
-      if (navAvatar) navAvatar.textContent = initials;
-      if (navName)   navName.textContent   = user.name || 'Patron';
-
       var drawerAvatar = document.getElementById('drawer-user-avatar');
       var drawerName   = document.getElementById('drawer-user-name');
       var drawerEmail  = document.getElementById('drawer-user-email');
@@ -2480,6 +2543,8 @@
     } else {
       if (openAuthBtn) openAuthBtn.style.display = 'inline-flex';
       if (navUserBtn)  navUserBtn.style.display  = 'none';
+      if (mobileAuthText) mobileAuthText.textContent = 'Sign In';
+      if (mobileTabAccountText) mobileTabAccountText.textContent = 'Sign In';
 
       var drawerAvatar = document.getElementById('drawer-user-avatar');
       var drawerName   = document.getElementById('drawer-user-name');
@@ -2491,26 +2556,18 @@
   }
 
   function openProfileDrawer() {
-    var drawer   = document.getElementById('profile-drawer');
-    var backdrop = document.getElementById('drawer-backdrop');
-    if (!drawer) return;
-    drawer.classList.add('drawer-open');
-    if (backdrop) {
-      backdrop.classList.remove('opacity-0', 'pointer-events-none');
-      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    var user = getBakeryUser();
+    if (user && user.loggedIn) {
+      window.history.pushState(null, '', '/profile');
+      showProfile();
+    } else {
+      openAuthModal();
     }
-    renderRecentOrdersDrawer();
   }
 
   function closeProfileDrawer() {
-    var drawer   = document.getElementById('profile-drawer');
-    var backdrop = document.getElementById('drawer-backdrop');
-    if (!drawer) return;
-    drawer.classList.remove('drawer-open');
-    if (backdrop) {
-      backdrop.classList.add('opacity-0', 'pointer-events-none');
-      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-    }
+    window.history.pushState(null, '', '/');
+    showBakery();
   }
 
   function renderRecentOrdersDrawer() {
@@ -2652,9 +2709,11 @@
     var b = document.getElementById('bakery-ui');
     var h = document.getElementById('hidden-chamber');
     var d = document.getElementById('developer-ui');
+    var p = document.getElementById('profile-ui');
     if (b) b.style.display = 'flex';
     if (h) h.style.display = 'none';
     if (d) d.style.display = 'none';
+    if (p) p.style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -2662,8 +2721,10 @@
     var b = document.getElementById('bakery-ui');
     var h = document.getElementById('hidden-chamber');
     var d = document.getElementById('developer-ui');
+    var p = document.getElementById('profile-ui');
     if (b) b.style.display = 'none';
     if (d) d.style.display = 'none';
+    if (p) p.style.display = 'none';
     if (h) {
       h.style.display = 'flex';
       h.style.flexDirection = 'column';
@@ -2675,12 +2736,31 @@
     var b = document.getElementById('bakery-ui');
     var h = document.getElementById('hidden-chamber');
     var d = document.getElementById('developer-ui');
+    var p = document.getElementById('profile-ui');
     if (b) b.style.display = 'none';
     if (h) h.style.display = 'none';
+    if (p) p.style.display = 'none';
     if (d) {
       d.style.display = 'flex';
       d.style.flexDirection = 'column';
     }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function showProfile() {
+    var b = document.getElementById('bakery-ui');
+    var h = document.getElementById('hidden-chamber');
+    var d = document.getElementById('developer-ui');
+    var p = document.getElementById('profile-ui');
+    if (b) b.style.display = 'none';
+    if (h) h.style.display = 'none';
+    if (d) d.style.display = 'none';
+    if (p) {
+      p.style.display = 'flex';
+      p.style.flexDirection = 'column';
+    }
+    renderUserUI();
+    renderRecentOrdersDrawer();
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
@@ -2769,6 +2849,173 @@
     }
   }
 
+
+  /* ═══════════════════════════════════════════════════════════
+     VAULT PRODUCT DETAILS MODAL CONTROLLER
+  ═══════════════════════════════════════════════════════════ */
+  var currentVaultDetailItem = null;
+
+  function openVaultProductModal(product) {
+    if (!product) return;
+    currentVaultDetailItem = product;
+
+    var modal = document.getElementById('vault-product-modal');
+    var titleEl = document.getElementById('vault-pdetail-title');
+    var priceEl = document.getElementById('vault-pdetail-price');
+    var descEl  = document.getElementById('vault-pdetail-desc');
+    var catEl   = document.getElementById('vault-pdetail-cat');
+    var imgWrap = document.getElementById('vault-pdetail-img-container');
+
+    if (titleEl) titleEl.textContent = product.title;
+    if (descEl)  descEl.textContent  = product.description || 'Exclusive underground reserve preparation.';
+
+    var rawPrice = (product.price != null) ? String(product.price).trim() : '';
+    var cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g,'')) || 0;
+    var displayPrice = cleanPrice > 0 ? ('$' + cleanPrice.toFixed(2)) : 'Price: TBD';
+    if (priceEl) priceEl.textContent = displayPrice;
+
+    var catObj = allCategories.find(function(c) { return c._id === product.categoryId; });
+    if (catEl) catEl.textContent = catObj ? catObj.title.toUpperCase() : 'VIP RESERVE';
+
+    if (imgWrap) {
+      if (product.imageUrl) {
+        imgWrap.innerHTML = '<img src="' + product.imageUrl + '" alt="' + escAttr(product.title) + '" class="w-full h-full object-cover rounded-2xl"/>';
+      } else {
+        imgWrap.innerHTML = '<div class="text-6xl">⚡</div>';
+      }
+    }
+
+    renderVaultModalActions(product);
+    renderVaultSuggestedItems(product);
+
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeVaultProductModal() {
+    var modal = document.getElementById('vault-product-modal');
+    if (modal) modal.style.display = 'none';
+    currentVaultDetailItem = null;
+  }
+
+  function renderVaultModalActions(product) {
+    var actWrap = document.getElementById('vault-pdetail-action-container');
+    if (!actWrap) return;
+
+    var currentQty = (chamberCart[product._id] ? chamberCart[product._id].qty : 0);
+
+    if (currentQty > 0) {
+      actWrap.innerHTML = '<div class="flex items-center justify-between bg-slate-900 border border-slate-700 p-1.5 rounded-2xl">' +
+        '<span class="text-xs font-mono font-bold text-slate-400 pl-3">In Your Bag:</span>' +
+        '<div class="flex items-center space-x-3">' +
+          '<button id="vault-modal-dec-btn" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-base flex items-center justify-center transition-all cursor-pointer">>−</button>' +
+          '<span class="font-mono font-black text-base text-cyan-400 min-w-[2rem] text-center">' + currentQty + '</span>' +
+          '<button id="vault-modal-inc-btn" class="w-9 h-9 rounded-xl font-bold text-base flex items-center justify-center transition-all cursor-pointer" style="background:rgba(34,211,238,0.2);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);">+</button>' +
+        '</div>' +
+      '</div>';
+
+      var decBtn = document.getElementById('vault-modal-dec-btn');
+      var incBtn = document.getElementById('vault-modal-inc-btn');
+      if (decBtn) {
+        decBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!chamberCart[product._id]) return;
+          chamberCart[product._id].qty--;
+          if (chamberCart[product._id].qty <= 0) delete chamberCart[product._id];
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          renderChamberUI();
+          renderVaultModalActions(product);
+        });
+      }
+      if (incBtn) {
+        incBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (product.stockQuantity && chamberCart[product._id].qty >= product.stockQuantity) {
+            showToast('⚠️ Maximum stock reached', 'amber');
+            return;
+          }
+          chamberCart[product._id].qty++;
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          renderChamberUI();
+          renderVaultModalActions(product);
+        });
+      }
+    } else {
+      actWrap.innerHTML = '<button id="vault-modal-add-btn" class="w-full min-h-[48px] py-3 px-6 rounded-2xl font-mono font-bold text-sm text-white flex items-center justify-center space-x-2 transition-all active:scale-98 cursor-pointer shadow-lg" style="background:linear-gradient(135deg,#22d3ee,#6366f1);box-shadow:0 0 20px rgba(34,211,238,0.3);">' +
+        '<span>🛒</span>' +
+        '<span>+ Add to Bag</span>' +
+      '</button>';
+
+      var addBtn = document.getElementById('vault-modal-add-btn');
+      if (addBtn) {
+        addBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!chamberCart[product._id]) {
+            chamberCart[product._id] = { _id: product._id, title: product.title, price: product.price, stockQuantity: product.stockQuantity, qty: 0 };
+          }
+          if (product.stockQuantity && chamberCart[product._id].qty >= product.stockQuantity) {
+            showToast('⚠️ Maximum stock reached', 'amber');
+            return;
+          }
+          chamberCart[product._id].qty++;
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          showToast('⚡ Added ' + product.title + ' to Bag', 'blue');
+          renderChamberUI();
+          renderVaultModalActions(product);
+        });
+      }
+    }
+  }
+
+  function renderVaultSuggestedItems(currentProduct) {
+    var container = document.getElementById('vault-pdetail-suggested-grid');
+    if (!container) return;
+
+    var sameCategory = allProducts.filter(function(p) {
+      return p.categoryId === currentProduct.categoryId && p._id !== currentProduct._id;
+    });
+
+    var pool = sameCategory.slice();
+    if (pool.length < 4) {
+      var otherItems = allProducts.filter(function(p) {
+        return p._id !== currentProduct._id && !pool.some(function(item) { return item._id === p._id; });
+      });
+      pool = pool.concat(otherItems);
+    }
+
+    var suggested = pool.slice(0, 4);
+
+    if (suggested.length === 0) {
+      container.innerHTML = '<p class="text-xs font-mono text-slate-500 col-span-4 text-center py-2">No related drops found.</p>';
+      return;
+    }
+
+    container.innerHTML = suggested.map(function(s) {
+      var rawPrice = (s.price != null) ? String(s.price).trim() : '';
+      var cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g,'')) || 0;
+      var displayPrice = cleanPrice > 0 ? ('$' + cleanPrice.toFixed(2)) : 'TBD';
+
+      return '<div class="vault-suggested-card p-2.5 rounded-xl border border-slate-800 hover:border-cyan-500/50 bg-slate-900/60 hover:bg-slate-900 transition-all cursor-pointer group" data-pid="' + s._id + '">' +
+        (s.imageUrl
+          ? '<img src="' + s.imageUrl + '" alt="' + escAttr(s.title) + '" class="w-full h-20 object-cover rounded-lg mb-2"/>'
+          : '<div class="w-full h-20 rounded-lg bg-slate-800 flex items-center justify-center text-2xl mb-2">⚡</div>') +
+        '<p class="font-street font-bold text-xs text-white group-hover:text-cyan-400 truncate">' + s.title + '</p>' +
+        '<p class="font-mono text-[11px] font-bold text-cyan-400 mt-0.5">' + displayPrice + '</p>' +
+      '</div>';
+    }).join('');
+
+    container.querySelectorAll('.vault-suggested-card').forEach(function(card) {
+      card.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var pid = card.dataset.pid;
+        var p = allProducts.find(function(item) { return item._id === pid; });
+        if (p) openVaultProductModal(p);
+      });
+    });
+  }
+
   function renderChamberUI() {
     var bar = document.getElementById('category-bar');
     if (bar) {
@@ -2816,7 +3063,7 @@
             var displayPrice = cleanPrice > 0 ? ('$' + cleanPrice.toFixed(2)) : 'Price: TBD';
             var currentQty = (chamberCart[p._id] ? chamberCart[p._id].qty : 0);
 
-            return '<div class="rounded-2xl p-4 bg-slate-900/70 border ' + t.border + ' space-y-3 hover:bg-slate-900 transition-colors flex flex-col justify-between" data-pid="' + p._id + '">' +
+            return '<div class="chamber-product-card rounded-2xl p-4 bg-slate-900/70 border ' + t.border + ' space-y-3 hover:bg-slate-900 transition-colors flex flex-col justify-between cursor-pointer" data-pid="' + p._id + '">' +
               '<div>' +
                 (p.imageUrl ? '<img src="' + p.imageUrl + '" alt="' + escAttr(p.title) + '" class="w-full h-32 rounded-xl object-cover mb-3"/>' : '<div class="w-full h-32 rounded-xl bg-slate-800 flex items-center justify-center text-3xl mb-3">⚡</div>') +
                 '<h4 class="font-street font-bold text-sm text-white leading-snug">' + p.title + '</h4>' +
@@ -2839,6 +3086,13 @@
     }).join('');
 
     function bindChamberCardEvents() {
+      psec.querySelectorAll('.chamber-product-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var pid = card.dataset.pid;
+          var p = allProducts.find(function(item) { return item._id === pid; });
+          if (p) openVaultProductModal(p);
+        });
+      });
       psec.querySelectorAll('.chamber-add-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -2977,6 +3231,16 @@
     if (pathname.includes('/developer')) {
       showDeveloper();
       loadBakery();
+    } else if (pathname.includes('/profile')) {
+      var user = getBakeryUser();
+      if (user && user.loggedIn) {
+        showProfile();
+      } else {
+        window.history.replaceState(null, '', '/');
+        showBakery();
+        openAuthModal();
+      }
+      loadBakery();
     } else if (pathname.includes('/secret-menu')) {
       if (isValidSession()) {
         showChamber();
@@ -2997,6 +3261,15 @@
       var currentPath = window.location.pathname;
       if (currentPath.includes('/developer')) {
         showDeveloper();
+      } else if (currentPath.includes('/profile')) {
+        var user = getBakeryUser();
+        if (user && user.loggedIn) {
+          showProfile();
+        } else {
+          window.history.replaceState(null, '', '/');
+          showBakery();
+          openAuthModal();
+        }
       } else if (currentPath.includes('/secret-menu')) {
         if (isValidSession()) {
           showChamber();
@@ -3017,6 +3290,28 @@
         e.preventDefault();
         window.history.pushState(null, '', '/');
         showBakery();
+      });
+    }
+
+    // Profile Return Button
+    var profileBackBtn = document.getElementById('profile-back-btn');
+    if (profileBackBtn) {
+      profileBackBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.history.pushState(null, '', '/');
+        showBakery();
+      });
+    }
+
+    // Vault Product Details Modal Close Bindings
+    var vaultPdetailModal = document.getElementById('vault-product-modal');
+    var closeVaultPdetailBtn = document.getElementById('close-vault-pdetail-btn');
+    if (closeVaultPdetailBtn) {
+      closeVaultPdetailBtn.addEventListener('click', closeVaultProductModal);
+    }
+    if (vaultPdetailModal) {
+      vaultPdetailModal.addEventListener('click', function(e) {
+        if (e.target === vaultPdetailModal) closeVaultProductModal();
       });
     }
 
