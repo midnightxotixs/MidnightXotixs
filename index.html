@@ -1214,8 +1214,8 @@
           <p id="cart-summary-text" class="text-white font-bold text-sm font-mono leading-tight mt-0.5">0 items &bull; $0.00</p>
         </div>
       </div>
-      <button id="open-preorder-btn" class="min-h-[44px] px-3 sm:px-5 py-2 rounded-xl font-mono font-bold text-xs sm:text-sm text-white flex items-center space-x-1.5 active:scale-95 transition-all whitespace-nowrap cursor-pointer" style="background:linear-gradient(135deg,#22d3ee,#6366f1);box-shadow:0 0 20px rgba(34,211,238,0.35);">
-        <span>Schedule Pickup</span>
+      <button id="open-vault-checkout-btn" class="min-h-[44px] px-3 sm:px-5 py-2 rounded-xl font-mono font-bold text-xs sm:text-sm text-white flex items-center space-x-1.5 active:scale-95 transition-all whitespace-nowrap cursor-pointer" style="background:linear-gradient(135deg,#22d3ee,#6366f1);box-shadow:0 0 20px rgba(34,211,238,0.35);">
+        <span>Order Now</span>
         <span>➜</span>
       </button>
     </div>
@@ -1226,104 +1226,108 @@
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
-<!-- CYBERPUNK PRE-ORDER & PICKUP MODAL (Chamber Engine 2)      -->
+<!-- VAULT COD CHECKOUT MODAL (Cyberpunk Cash on Delivery)      -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="preorder-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" style="background:rgba(5,8,15,0.85);backdrop-filter:blur(10px); display:none;">
-  <div class="cyber-modal-inner w-full max-w-lg rounded-t-3xl sm:rounded-2xl overflow-hidden" style="background:#0D1220;border:1px solid rgba(34,211,238,0.25);box-shadow:0 0 60px rgba(34,211,238,0.1),0 32px 64px rgba(0,0,0,0.8);">
+<div id="vault-checkout-modal" class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" style="background:rgba(5,8,15,0.9);backdrop-filter:blur(12px); display:none;">
+  <div class="w-full max-w-lg rounded-t-3xl sm:rounded-2xl overflow-hidden" style="background:rgba(13,18,32,0.97);border:1px solid rgba(34,211,238,0.2);box-shadow:0 0 60px rgba(34,211,238,0.08),0 32px 64px rgba(0,0,0,0.9);">
 
-    <div class="px-5 py-4 flex items-center justify-between border-b" style="border-color:rgba(34,211,238,0.15);background:rgba(34,211,238,0.04);">
+    <!-- Modal Header -->
+    <div class="px-5 py-4 flex items-center justify-between border-b" style="border-color:rgba(34,211,238,0.12);background:rgba(34,211,238,0.03);">
       <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background:rgba(34,211,238,0.15);border:1px solid rgba(34,211,238,0.4);">📦</div>
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm" style="background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.35);">🛒</div>
         <div>
-          <h3 class="font-street font-black text-white tracking-wider text-sm uppercase">Schedule Pickup / Pre-Order</h3>
-          <p class="text-[10px] font-mono text-slate-500 -mt-0.5">ENCRYPTED ORDER PROTOCOL v2.5</p>
+          <h3 class="font-street font-black text-white tracking-wider text-sm uppercase">Vault Checkout</h3>
+          <p class="text-[10px] font-mono text-slate-500 -mt-0.5">CASH ON DELIVERY · SECURE DISPATCH</p>
         </div>
       </div>
-      <button id="close-preorder-btn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 transition-colors cursor-pointer" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+      <button id="close-vault-checkout-btn" class="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-300 transition-colors cursor-pointer" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
-    <div id="preorder-form-view" class="overflow-y-auto" style="max-height:80vh;">
+    <!-- Form View -->
+    <div id="vault-checkout-form-view" class="overflow-y-auto" style="max-height:82vh;">
       <div class="p-5 space-y-4">
 
-        <div class="rounded-xl p-4 space-y-2" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);">
+        <!-- Order Summary -->
+        <div class="rounded-xl p-4 space-y-2" style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);">
           <div class="flex items-center justify-between mb-2">
             <p class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500">Order Summary</p>
-            <span class="text-[10px] font-mono text-cyan-400">Inventory Verified</span>
+            <span class="text-[10px] font-mono text-emerald-400">✓ Verified</span>
           </div>
-          <div id="modal-order-items" class="space-y-2"></div>
-          <div class="flex items-center justify-between pt-2 mt-2" style="border-top:1px solid rgba(255,255,255,0.07);">
-            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Total</span>
-            <span id="modal-order-total" class="font-mono font-bold text-sm sm:text-base text-right" style="color:#22d3ee;">$0.00</span>
+          <div id="vault-order-items" class="space-y-2"></div>
+          <div class="flex items-center justify-between pt-2 mt-2" style="border-top:1px solid rgba(255,255,255,0.06);">
+            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Total Bill</span>
+            <span id="vault-order-total" class="font-mono font-bold text-base" style="color:#22d3ee;">$0.00</span>
           </div>
         </div>
 
+        <!-- Fields -->
         <div>
-          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Customer Name / Alias</label>
-          <input type="text" id="po-name" class="cyber-input" placeholder="e.g. Phantom_7, Alex M." required/>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Full Name or Alias <span style="color:#ef4444">*</span></label>
+          <input type="text" id="vault-cod-name" class="cyber-input" placeholder="Full Name or Alias" required/>
         </div>
         <div>
-          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Contact Handle / Phone</label>
-          <input type="text" id="po-contact" class="cyber-input" placeholder="WhatsApp: +1XXXXXXXXXX or @TelegramUser" required/>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Delivery Address / Drop Point <span style="color:#ef4444">*</span></label>
+          <textarea id="vault-cod-address" rows="2" class="cyber-input resize-none" placeholder="Delivery location, drop point, or street address" required></textarea>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Date</label>
-            <input type="date" id="po-date" class="cyber-input" required/>
+            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Phone <span class="text-slate-600 normal-case font-normal">(optional)</span></label>
+            <input type="tel" id="vault-cod-phone" class="cyber-input" placeholder="Phone Number"/>
           </div>
           <div>
-            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Time</label>
-            <select id="po-time" class="cyber-input">
-              <option value="Afternoon (12PM–4PM)">Afternoon (12–4 PM)</option>
-              <option value="Evening (4PM–8PM)">Evening (4–8 PM)</option>
-              <option value="Night (8PM–12AM)">Night (8 PM–12 AM)</option>
-              <option value="Late Night (12AM–4AM)">Late Night (12–4 AM)</option>
-            </select>
+            <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Email <span class="text-slate-600 normal-case font-normal">(optional)</span></label>
+            <input type="email" id="vault-cod-email" class="cyber-input" placeholder="Email Address"/>
           </div>
         </div>
         <div>
-          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Pickup Location / Meeting Spot</label>
-          <input type="text" id="po-location" class="cyber-input" placeholder="e.g. Downtown Lounge, 5th Ave Corner" required/>
+          <label class="block text-[11px] font-mono font-bold text-slate-400 mb-1.5 uppercase tracking-wider">Order Note <span class="text-slate-600 normal-case font-normal">(optional)</span></label>
+          <textarea id="vault-cod-note" rows="2" class="cyber-input resize-none" placeholder="Special instructions or delivery note"></textarea>
         </div>
 
-        <button id="preorder-submit-btn" class="w-full min-h-[48px] rounded-xl font-mono font-black text-sm uppercase tracking-wider flex items-center justify-center space-x-2 transition-all active:scale-[0.99] cursor-pointer" style="background:linear-gradient(135deg,#22d3ee,#6366f1);color:#fff;box-shadow:0 0 24px rgba(34,211,238,0.4);">
-          <svg id="preorder-spinner" class="cyber-spin w-4 h-4 text-white shrink-0" fill="none" viewBox="0 0 24 24" style="display:none;">
+        <!-- Payment: Locked COD -->
+        <div class="rounded-xl p-3.5 flex items-center justify-between" style="background:rgba(34,211,238,0.04);border:1px solid rgba(34,211,238,0.2);">
+          <label class="flex items-center space-x-3 cursor-default">
+            <input type="radio" name="vault-payment" value="cod" checked disabled class="w-4 h-4 accent-cyan-400"/>
+            <div>
+              <p class="text-xs font-bold text-slate-200">Cash on Delivery (COD)</p>
+              <p class="text-[10px] text-slate-500 font-mono">Pay in cash when your order arrives</p>
+            </div>
+          </label>
+          <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded" style="background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);">Selected</span>
+        </div>
+
+        <!-- Submit -->
+        <button id="vault-cod-submit-btn" class="w-full min-h-[50px] rounded-xl font-mono font-black text-sm uppercase tracking-wider flex items-center justify-center space-x-2 transition-all active:scale-[0.99] cursor-pointer" style="background:linear-gradient(135deg,#22d3ee,#10b981);color:#022c22;box-shadow:0 0 24px rgba(34,211,238,0.4);">
+          <svg id="vault-cod-spinner" class="cyber-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" style="display:none;color:#022c22;">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
-          <span id="preorder-submit-text">🔒 Secure Pre-Order</span>
+          <span id="vault-cod-submit-text">Place Order (Cash on Delivery)</span>
         </button>
 
-        <p class="text-center text-[10px] font-mono text-slate-600 leading-relaxed">
-          Submission encrypted &bull; Single-use dispatch protocol &bull; Response via chat within 2 hrs
+        <p class="text-center text-[10px] font-mono text-slate-600 leading-relaxed pb-2">
+          Order secured via encrypted dispatch &bull; Payment collected on delivery
         </p>
       </div>
     </div>
 
     <!-- Success View -->
-    <div id="preorder-success-view" class="p-6 text-center space-y-6" style="display:none;">
-      <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl success-ring" style="background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.6);">✓</div>
+    <div id="vault-checkout-success-view" class="p-6 text-center space-y-5" style="display:none;">
+      <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl" style="background:rgba(16,185,129,0.15);border:2px solid rgba(16,185,129,0.5);">✓</div>
       <div class="space-y-2">
-        <h3 class="font-street font-black text-xl text-white tracking-wider uppercase">Order Confirmed!</h3>
-        <p class="text-sm font-mono text-slate-400 leading-relaxed">Your pre-order has been secured!<br/>We are preparing your stash.</p>
+        <h3 class="font-street font-black text-xl text-white tracking-wider uppercase">Order Secured!</h3>
+        <p class="text-sm font-mono text-slate-400 leading-relaxed">Order placed successfully!<br/>We are preparing your drop.<br/>Payment will be collected in cash upon delivery.</p>
         <div class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>ORDER ID: <span id="success-order-id" class="font-bold">MX-XXXXXX</span></span>
+          <span>ORDER ID: <span id="vault-success-order-id" class="font-bold">VLT-XXXXXX</span></span>
         </div>
       </div>
-
-      <div id="success-summary" class="text-left rounded-xl p-4 space-y-2 text-xs font-mono text-slate-400" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);"></div>
-
-      <div class="space-y-3 pt-2">
-        <button id="success-chat-btn" class="w-full min-h-[46px] rounded-xl font-mono font-bold text-sm flex items-center justify-center space-x-2 transition-all active:scale-[0.99] cursor-pointer" style="background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.4);color:#25d366;box-shadow:0 0 16px rgba(37,211,102,0.2);">
-          <span>💬</span>
-          <span>Proceed to Chat (WhatsApp / Telegram)</span>
-        </button>
-        <button id="success-done-btn" class="w-full min-h-[46px] rounded-xl font-mono font-bold text-sm transition-all active:scale-[0.99] cursor-pointer" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;">
-          Done — Close &amp; Clear Stash
-        </button>
-      </div>
+      <div id="vault-success-summary" class="text-left rounded-xl p-4 space-y-1.5 text-xs font-mono text-slate-400" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);"></div>
+      <button id="vault-success-done-btn" class="w-full min-h-[48px] rounded-xl font-mono font-bold text-sm transition-all active:scale-[0.99] cursor-pointer" style="background:linear-gradient(135deg,#22d3ee,#6366f1);color:#fff;box-shadow:0 0 20px rgba(34,211,238,0.3);">
+        Done
+      </button>
     </div>
 
   </div>
@@ -2808,23 +2812,25 @@
         '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' +
           prods.map(function(p) {
             var rawPrice = (p.price != null) ? String(p.price).trim() : '';
-            var isPreorder = (p.stockQuantity === 0);
-            var displayPrice = isPreorder && (!rawPrice || rawPrice === '0' || rawPrice === '$0') ? 'Price: TBD' : (rawPrice || '$0.00');
+            var cleanPrice = parseFloat(rawPrice.replace(/[^0-9.]/g,'')) || 0;
+            var displayPrice = cleanPrice > 0 ? ('$' + cleanPrice.toFixed(2)) : 'Price: TBD';
+            var currentQty = (chamberCart[p._id] ? chamberCart[p._id].qty : 0);
 
             return '<div class="rounded-2xl p-4 bg-slate-900/70 border ' + t.border + ' space-y-3 hover:bg-slate-900 transition-colors flex flex-col justify-between" data-pid="' + p._id + '">' +
               '<div>' +
                 (p.imageUrl ? '<img src="' + p.imageUrl + '" alt="' + escAttr(p.title) + '" class="w-full h-32 rounded-xl object-cover mb-3"/>' : '<div class="w-full h-32 rounded-xl bg-slate-800 flex items-center justify-center text-3xl mb-3">⚡</div>') +
-                '<div class="flex items-start justify-between gap-2">' +
-                  '<h4 class="font-street font-bold text-sm text-white leading-snug">' + p.title + '</h4>' +
-                  (isPreorder ? '<span class="text-[9px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded-full uppercase shrink-0">Pre-Order</span>' : '') +
-                '</div>' +
+                '<h4 class="font-street font-bold text-sm text-white leading-snug">' + p.title + '</h4>' +
                 '<p class="text-[11px] font-mono text-slate-400 mt-1 line-clamp-2">' + (p.description || '') + '</p>' +
               '</div>' +
-              '<div class="pt-2 border-t border-slate-800 flex items-center justify-between">' +
+              '<div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">' +
                 '<span class="font-mono text-xs font-bold text-cyan-400">' + displayPrice + '</span>' +
-                '<button class="chamber-add-btn text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition-all cursor-pointer" data-pid="' + p._id + '">' +
-                  (isPreorder ? 'Pre-Order' : '+ Add') +
-                '</button>' +
+                (currentQty > 0
+                  ? '<div class="flex items-center space-x-2 shrink-0">' +
+                      '<button class="chamber-qty-dec w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm flex items-center justify-center transition-all cursor-pointer" data-pid="' + p._id + '">−</button>' +
+                      '<span class="chamber-qty-display font-mono font-bold text-sm text-white min-w-[1.5rem] text-center" data-pid="' + p._id + '">' + currentQty + '</span>' +
+                      '<button class="chamber-qty-inc w-7 h-7 rounded-lg font-bold text-sm flex items-center justify-center transition-all cursor-pointer" style="background:rgba(34,211,238,0.2);color:#22d3ee;border:1px solid rgba(34,211,238,0.3);" data-pid="' + p._id + '">+</button>' +
+                    '</div>'
+                  : '<button class="chamber-add-btn text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl transition-all cursor-pointer shrink-0" style="background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.25);" data-pid="' + p._id + '">+ Add to Bag</button>') +
               '</div>' +
             '</div>';
           }).join('') +
@@ -2832,36 +2838,58 @@
       '</div>';
     }).join('');
 
-    psec.querySelectorAll('.chamber-add-btn').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var pid = btn.dataset.pid;
-        var p = allProducts.find(function(item) { return item._id === pid; });
-        if (!p) return;
-
-        if (!chamberCart[pid]) {
-          chamberCart[pid] = {
-            _id: p._id,
-            title: p.title,
-            price: p.price,
-            stockQuantity: p.stockQuantity,
-            categoryColor: p.categoryColor,
-            qty: 0
-          };
-        }
-
-        if (p.stockQuantity && chamberCart[pid].qty >= p.stockQuantity) {
-          showToast('⚠️ Maximum allocation reached (' + p.stockQuantity + ' units)', 'amber');
-          return;
-        }
-
-        chamberCart[pid].qty++;
-        try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
-        updateChamberCartUI();
-        showToast('⚡ Added ' + p.title + ' to Stash', 'blue');
+    function bindChamberCardEvents() {
+      psec.querySelectorAll('.chamber-add-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var pid = btn.dataset.pid;
+          var p = allProducts.find(function(item) { return item._id === pid; });
+          if (!p) return;
+          if (!chamberCart[pid]) {
+            chamberCart[pid] = { _id: p._id, title: p.title, price: p.price, stockQuantity: p.stockQuantity, qty: 0 };
+          }
+          if (p.stockQuantity && chamberCart[pid].qty >= p.stockQuantity) {
+            showToast('⚠️ Maximum quantity reached', 'amber'); return;
+          }
+          chamberCart[pid].qty++;
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          showToast('⚡ Added ' + p.title + ' to Bag', 'blue');
+          renderChamberUI();
+        });
       });
-    });
 
+      psec.querySelectorAll('.chamber-qty-inc').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var pid = btn.dataset.pid;
+          var p = allProducts.find(function(item) { return item._id === pid; });
+          if (!p || !chamberCart[pid]) return;
+          if (p.stockQuantity && chamberCart[pid].qty >= p.stockQuantity) {
+            showToast('⚠️ Maximum quantity reached', 'amber'); return;
+          }
+          chamberCart[pid].qty++;
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          renderChamberUI();
+        });
+      });
+
+      psec.querySelectorAll('.chamber-qty-dec').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var pid = btn.dataset.pid;
+          if (!chamberCart[pid]) return;
+          chamberCart[pid].qty--;
+          if (chamberCart[pid].qty <= 0) delete chamberCart[pid];
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          renderChamberUI();
+        });
+      });
+    }
+
+    bindChamberCardEvents();
     updateChamberCartUI();
   }
 
@@ -3426,97 +3454,112 @@
       });
     }
 
-    // Chamber Pre-Order Modal Events
-    var openPreorder = document.getElementById('open-preorder-btn');
-    var closePreorder = document.getElementById('close-preorder-btn');
-    var preorderModal = document.getElementById('preorder-modal');
+    // Vault COD Checkout Modal
+    var vaultModal     = document.getElementById('vault-checkout-modal');
+    var openVaultBtn   = document.getElementById('open-vault-checkout-btn');
+    var closeVaultBtn  = document.getElementById('close-vault-checkout-btn');
+    var vaultSubmitBtn = document.getElementById('vault-cod-submit-btn');
+    var vaultDoneBtn   = document.getElementById('vault-success-done-btn');
 
-    function openPreorderModal() {
+    function calculateVaultTotal() {
+      var total = 0;
+      Object.values(chamberCart).forEach(function(item) {
+        var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
+        total += item.qty * clean;
+      });
+      return total;
+    }
+
+    function openVaultCheckout() {
       var entries = Object.values(chamberCart);
-      if (entries.length === 0) return;
-      var itemsBox = document.getElementById('modal-order-items');
-      var totEl    = document.getElementById('modal-order-total');
+      if (entries.length === 0) { showToast('Your bag is empty.', 'amber'); return; }
+
+      var itemsEl = document.getElementById('vault-order-items');
+      var totalEl = document.getElementById('vault-order-total');
       var total = 0;
 
-      if (itemsBox) {
-        itemsBox.innerHTML = entries.map(function(item) {
+      if (itemsEl) {
+        itemsEl.innerHTML = entries.map(function(item) {
           var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
-          total += (item.qty * clean);
-          return '<div class="flex items-center justify-between text-xs font-mono text-slate-300">' +
-            '<span>' + item.qty + 'x ' + item.title + '</span>' +
-            '<span class="text-cyan-400">$' + (item.qty * clean).toFixed(2) + '</span>' +
+          total += item.qty * clean;
+          return '<div class="flex items-center justify-between text-xs font-mono">' +
+            '<span class="text-slate-300">' + item.qty + 'x ' + escAttr(item.title) + '</span>' +
+            '<span style="color:#22d3ee;">$' + (item.qty * clean).toFixed(2) + '</span>' +
           '</div>';
         }).join('');
       }
-      if (totEl) totEl.textContent = '$' + total.toFixed(2);
+      if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
 
-      var poDate = document.getElementById('po-date');
-      if (poDate && !poDate.value) {
-        var tmrw = new Date();
-        tmrw.setDate(tmrw.getDate() + 1);
-        poDate.value = tmrw.toISOString().split('T')[0];
-      }
-
-      var formView = document.getElementById('preorder-form-view');
-      var succView = document.getElementById('preorder-success-view');
-      if (formView) formView.style.display = 'block';
-      if (succView) succView.style.display = 'none';
-      if (preorderModal) preorderModal.style.display = 'flex';
+      var formV = document.getElementById('vault-checkout-form-view');
+      var succV = document.getElementById('vault-checkout-success-view');
+      if (formV) formV.style.display = 'block';
+      if (succV) succV.style.display = 'none';
+      if (vaultModal) vaultModal.style.display = 'flex';
     }
 
-    function closePreorderModal() {
-      if (preorderModal) preorderModal.style.display = 'none';
+    function closeVaultCheckout() {
+      if (vaultModal) vaultModal.style.display = 'none';
     }
 
-    if (openPreorder)  openPreorder.addEventListener('click', openPreorderModal);
-    if (closePreorder) closePreorder.addEventListener('click', closePreorderModal);
-    if (preorderModal) {
-      preorderModal.addEventListener('click', function(e) {
-        if (e.target === preorderModal) closePreorderModal();
+    if (openVaultBtn)  openVaultBtn.addEventListener('click', openVaultCheckout);
+    if (closeVaultBtn) closeVaultBtn.addEventListener('click', closeVaultCheckout);
+    if (vaultModal) {
+      vaultModal.addEventListener('click', function(e) {
+        if (e.target === vaultModal) closeVaultCheckout();
       });
     }
 
-    var preorderSubmit = document.getElementById('preorder-submit-btn');
-    if (preorderSubmit) {
-      preorderSubmit.addEventListener('click', async function() {
-        var name     = (document.getElementById('po-name') || {}).value || '';
-        var contact  = (document.getElementById('po-contact') || {}).value || '';
-        var date     = (document.getElementById('po-date') || {}).value || '';
-        var time     = (document.getElementById('po-time') || {}).value || '';
-        var location = (document.getElementById('po-location') || {}).value || '';
+    if (vaultSubmitBtn) {
+      vaultSubmitBtn.addEventListener('click', async function() {
+        var nameVal    = (document.getElementById('vault-cod-name')    || {}).value || '';
+        var addressVal = (document.getElementById('vault-cod-address') || {}).value || '';
+        var phoneVal   = (document.getElementById('vault-cod-phone')   || {}).value || '';
+        var emailVal   = (document.getElementById('vault-cod-email')   || {}).value || '';
+        var noteVal    = (document.getElementById('vault-cod-note')    || {}).value || '';
 
-        if (!name || !contact || !date || !location) {
-          showToast('Please complete all pickup coordinates.', 'amber');
+        nameVal    = nameVal.trim();
+        addressVal = addressVal.trim();
+        phoneVal   = phoneVal.trim();
+        emailVal   = emailVal.trim();
+        noteVal    = noteVal.trim();
+
+        if (!nameVal || !addressVal) {
+          showToast('⚠️ Full Name and Delivery Address are required.', 'amber');
           return;
         }
 
-        var sp = document.getElementById('preorder-spinner');
-        var tx = document.getElementById('preorder-submit-text');
+        var sp = document.getElementById('vault-cod-spinner');
+        var tx = document.getElementById('vault-cod-submit-text');
         if (sp) sp.style.display = 'inline-block';
-        if (tx) tx.textContent   = 'Securing Allocation...';
-        preorderSubmit.disabled   = true;
+        if (tx) tx.textContent   = 'Placing Order...';
+        vaultSubmitBtn.disabled   = true;
 
         var entries = Object.values(chamberCart);
-        var total = 0;
-        var summaryArr = entries.map(function(item) {
-          var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
-          total += (item.qty * clean);
-          return item.qty + 'x ' + item.title;
-        });
+        var total   = calculateVaultTotal();
+        var orderId = 'VLT-' + Math.floor(100000 + Math.random() * 900000);
 
-        var orderId = 'MX-' + Math.floor(100000 + Math.random() * 900000);
+        var sessionRaw = null;
+        try { sessionRaw = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch(e) {}
+        var userPasscode = (sessionRaw && sessionRaw.passcode) ? sessionRaw.passcode : 'Session';
+
+        var itemsSummaryStr = entries.map(function(item) {
+          var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
+          return item.qty + 'x ' + item.title + ' ($' + (clean * item.qty).toFixed(2) + ')';
+        }).join(', ');
+
         var payload = {
+          action: 'vault_order',
           orderId: orderId,
-          timestamp: new Date().toISOString(),
-          orderType: 'VIP Chamber Pre-Order',
-          name: name,
-          contact: contact,
-          date: date,
-          time: time,
-          location: location,
-          items: entries,
-          summary: summaryArr.join(', '),
-          total: '$' + total.toFixed(2)
+          passcode: userPasscode,
+          customerName: nameVal,
+          deliveryLocation: addressVal,
+          phone: phoneVal || 'N/A',
+          email: emailVal || 'N/A',
+          orderNote: noteVal || 'None',
+          itemsSummary: itemsSummaryStr,
+          totalAmount: '$' + total.toFixed(2),
+          paymentMethod: 'Cash on Delivery',
+          timestamp: new Date().toISOString()
         };
 
         try {
@@ -3524,62 +3567,51 @@
             fetch(GOOGLE_SCRIPT_WEBAPP_URL, {
               method: 'POST',
               mode: 'no-cors',
-              headers: { 'Content-Type': 'application/json' },
+              cache: 'no-cache',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
               body: JSON.stringify(payload)
-            }).catch(function(err) { console.warn('Webhook dispatch:', err); });
+            }).catch(function(err) { console.warn('Vault dispatch:', err); });
           }
 
-          var formView = document.getElementById('preorder-form-view');
-          var succView = document.getElementById('preorder-success-view');
-          var succId   = document.getElementById('success-order-id');
-          var succSumm = document.getElementById('success-summary');
-
-          if (formView) formView.style.display = 'none';
-          if (succView) succView.style.display = 'block';
-          if (succId)   succId.textContent   = orderId;
-          if (succSumm) {
-            succSumm.innerHTML = '<p><strong class="text-slate-200">Customer:</strong> ' + escAttr(name) + ' (' + escAttr(contact) + ')</p>' +
-              '<p><strong class="text-slate-200">Pickup:</strong> ' + escAttr(date) + ' • ' + escAttr(time) + '</p>' +
-              '<p><strong class="text-slate-200">Location:</strong> ' + escAttr(location) + '</p>' +
-              '<p><strong class="text-slate-200">Allocation:</strong> ' + escAttr(summaryArr.join(', ')) + '</p>' +
-              '<p class="pt-1 text-cyan-400 font-bold">Total: $' + total.toFixed(2) + '</p>';
-          }
-
-          window.__lastOrder = payload;
           chamberCart = {};
           try { localStorage.removeItem(CART_KEY); } catch(e) {}
           updateChamberCartUI();
 
+          var formV   = document.getElementById('vault-checkout-form-view');
+          var succV   = document.getElementById('vault-checkout-success-view');
+          var succIdEl = document.getElementById('vault-success-order-id');
+          var succSumm = document.getElementById('vault-success-summary');
+
+          if (formV)    formV.style.display   = 'none';
+          if (succV)    succV.style.display   = 'block';
+          if (succIdEl) succIdEl.textContent  = orderId;
+          if (succSumm) {
+            succSumm.innerHTML =
+              '<p><strong style="color:#e2e8f0;">Customer:</strong> ' + escAttr(nameVal) + '</p>' +
+              '<p><strong style="color:#e2e8f0;">Location:</strong> ' + escAttr(addressVal) + '</p>' +
+              (phoneVal ? '<p><strong style="color:#e2e8f0;">Phone:</strong> ' + escAttr(phoneVal) + '</p>' : '') +
+              (noteVal  ? '<p><strong style="color:#e2e8f0;">Note:</strong> ' + escAttr(noteVal) + '</p>' : '') +
+              '<p style="color:#22d3ee;font-weight:700;padding-top:4px;">Total Due on Delivery: $' + total.toFixed(2) + '</p>';
+          }
+
+          showToast('⚡ Vault Order Confirmed!', 'emerald');
+
         } catch(err) {
-          console.error('Pre-order error:', err);
-          showToast('Failed to secure pre-order. Please retry.', 'red');
+          console.error('Vault checkout error:', err);
+          showToast('Order failed. Please retry.', 'red');
         } finally {
           if (sp) sp.style.display = 'none';
-          if (tx) tx.textContent   = '🔒 Secure Pre-Order';
-          preorderSubmit.disabled   = false;
+          if (tx) tx.textContent   = 'Place Order (Cash on Delivery)';
+          vaultSubmitBtn.disabled   = false;
         }
       });
     }
 
-    var succChatBtn = document.getElementById('success-chat-btn');
-    if (succChatBtn) {
-      succChatBtn.addEventListener('click', function() {
-        var ord = window.__lastOrder;
-        var text = 'Midnight Xotixs Pre-Order Confirmed\n';
-        if (ord) {
-          text += 'Order ID: ' + ord.orderId + '\nName: ' + ord.name + '\nContact: ' + ord.contact + '\nPickup: ' + ord.date + ' (' + ord.time + ')\nLocation: ' + ord.location + '\nItems: ' + ord.summary + '\nTotal: ' + ord.total;
-        }
-        var targetUrl = orderChatUrl || 'https://wa.me/18005550199';
-        var delim = targetUrl.includes('?') ? '&' : '?';
-        window.open(targetUrl + delim + 'text=' + encodeURIComponent(text), '_blank');
-      });
-    }
-
-    var succDoneBtn = document.getElementById('success-done-btn');
-    if (succDoneBtn) {
-      succDoneBtn.addEventListener('click', function() {
-        closePreorderModal();
-        showToast('Order secured. See you at the drop.', 'purple');
+    if (vaultDoneBtn) {
+      vaultDoneBtn.addEventListener('click', function() {
+        closeVaultCheckout();
+        renderChamberUI();
+        showToast('🔐 Order secured. See you at the drop.', 'purple');
       });
     }
 
