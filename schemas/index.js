@@ -1,8 +1,23 @@
-import passcode      from './passcode'
-import siteSettings  from './siteSettings'
-import bakeryProduct  from './bakeryProduct'
-import category      from './category'
-import hiddenProduct  from './hiddenProduct'
-import customer       from './customer'
+// 1. Front Bakery Management
+import bakerySettings from './bakerySettings.js'
+import bakeryProduct  from './bakeryProduct.js'
+import customer       from './customer.js'
 
-export const schemaTypes = [passcode, siteSettings, bakeryProduct, category, hiddenProduct, customer]
+// 2. VIP Vault Management
+import vaultSettings  from './vaultSettings.js'
+import hiddenProduct  from './hiddenProduct.js'
+import category       from './category.js'
+import passcode       from './passcode.js'
+
+export const schemaTypes = [
+  // Front Bakery
+  bakerySettings,
+  bakeryProduct,
+  customer,
+
+  // VIP Vault
+  vaultSettings,
+  hiddenProduct,
+  category,
+  passcode,
+]
