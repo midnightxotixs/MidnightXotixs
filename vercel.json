@@ -3,6 +3,7 @@
   "outputDirectory": ".",
   "rewrites": [
     { "source": "/studio/((?!static/).*)", "destination": "/studio/index.html" },
-    { "source": "/static/:path*", "destination": "/studio/static/:path*" }
+    { "source": "/static/:path*", "destination": "/studio/static/:path*" },
+    { "source": "/secret-menu", "destination": "/index.html" }
   ]
 }
