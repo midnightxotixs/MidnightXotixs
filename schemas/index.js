@@ -1,6 +1,7 @@
 // 1. Front Bakery Management
-import bakerySettings from './bakerySettings.js'
+import bakeryCategory from './bakeryCategory.js'
 import bakeryProduct  from './bakeryProduct.js'
+import bakerySettings from './bakerySettings.js'
 import customer       from './customer.js'
 
 // 2. VIP Vault Management
@@ -11,8 +12,9 @@ import passcode       from './passcode.js'
 
 export const schemaTypes = [
   // Front Bakery
-  bakerySettings,
+  bakeryCategory,
   bakeryProduct,
+  bakerySettings,
   customer,
 
   // VIP Vault
