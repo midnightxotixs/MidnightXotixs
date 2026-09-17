@@ -42,6 +42,7 @@
     /* Prevent FOUC — inline gate script sets display dynamically */
     #bakery-ui      { display: none; }
     #hidden-chamber { display: none; }
+    #developer-ui   { display: none; }
 
     body {
       background-color: #FAF7F2;
@@ -155,7 +156,24 @@
   <script>
     (function() {
       var pathname = window.location.pathname;
+      var isDeveloperRoute = pathname.includes('/developer');
       var isSecretRoute = pathname.includes('/secret-menu');
+
+      if (isDeveloperRoute) {
+        document.addEventListener('DOMContentLoaded', function() {
+          var b = document.getElementById('bakery-ui');
+          var h = document.getElementById('hidden-chamber');
+          var d = document.getElementById('developer-ui');
+          if (b) b.style.display = 'none';
+          if (h) h.style.display = 'none';
+          if (d) {
+            d.style.display = 'flex';
+            d.style.flexDirection = 'column';
+          }
+        });
+        return;
+      }
+
       try {
         var raw = localStorage.getItem('xotixs_session');
         if (raw) {
@@ -168,7 +186,9 @@
               document.addEventListener('DOMContentLoaded', function() {
                 var b = document.getElementById('bakery-ui');
                 var h = document.getElementById('hidden-chamber');
+                var d = document.getElementById('developer-ui');
                 if (b) b.style.display = 'none';
+                if (d) d.style.display = 'none';
                 if (h) {
                   h.style.display = 'flex';
                   h.style.flexDirection = 'column';
@@ -193,11 +213,13 @@
       document.addEventListener('DOMContentLoaded', function() {
         var b = document.getElementById('bakery-ui');
         var h = document.getElementById('hidden-chamber');
+        var d = document.getElementById('developer-ui');
         if (b) {
           b.style.display = 'flex';
           b.style.flexDirection = 'column';
         }
         if (h) h.style.display = 'none';
+        if (d) d.style.display = 'none';
       });
     })();
   </script>
@@ -977,6 +999,165 @@
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
+<!--  7. DEVELOPER CREDITS & ARCHITECTURE VIEW (/developer)    -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div id="developer-ui" class="w-full relative min-h-screen text-slate-100 flex flex-col justify-between overflow-x-hidden" style="background-color:#080B10; display:none;">
+  
+  <!-- Ambient High-Tech Glow Effects -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/5 rounded-full blur-[160px] pointer-events-none"></div>
+
+  <!-- Developer View Navbar / Header Bar -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#080B10]/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+      <button id="dev-return-btn" class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-slate-300 hover:text-white font-mono text-xs sm:text-sm transition-all active:scale-95 cursor-pointer shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span>← Return to Store</span>
+      </button>
+
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>SYSTEM ARCHITECTURE v2.4</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 flex-1 flex flex-col justify-center w-full">
+    
+    <!-- Header Section -->
+    <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-4">
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-slate-400 text-xs font-mono font-semibold tracking-wider uppercase shadow-inner">
+        <span>⚡</span><span>Proprietary Engineering Roster</span>
+      </div>
+      <h1 class="font-street text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1]">
+        System Architects &amp; <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">Engineering</span>
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base sm:leading-relaxed max-w-2xl mx-auto font-sans">
+        The minds and hands behind the architecture, design, and full-stack development of Midnight Treats &amp; Xotixs.
+      </p>
+    </div>
+
+    <!-- Showcase Cards Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto w-full">
+      
+      <!-- CARD 1: CONCEPT, SYSTEM STRATEGY & UX DESIGN -->
+      <div class="rounded-3xl bg-slate-900/80 border border-slate-800/90 p-6 sm:p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 shadow-2xl hover:shadow-blue-500/10">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all"></div>
+        
+        <div>
+          <!-- Top Tag & Avatar Monogram -->
+          <div class="flex items-start justify-between gap-4 mb-6">
+            <div class="space-y-1">
+              <span class="inline-block font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-blue-400 bg-blue-950/60 border border-blue-500/30 px-2.5 py-1 rounded-md">
+                Concept &amp; UX Strategy
+              </span>
+              <h2 class="text-xl sm:text-2xl font-black text-white pt-1">Md Tarikuzzaman Sabbir</h2>
+              <p class="text-xs sm:text-sm font-semibold text-blue-300/90 font-mono">Lead System Strategist &amp; Concept Architect</p>
+            </div>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-lg sm:text-xl font-mono font-bold shadow-lg shadow-blue-500/20 border border-blue-400/40 shrink-0">
+              TS
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px w-full bg-slate-800/80 mb-5"></div>
+
+          <!-- Contribution Details -->
+          <div class="space-y-3 mb-8">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-bold">Key Architectural Contributions:</p>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300">
+              <li class="flex items-start space-x-2.5">
+                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
+                <span>End-to-end concept formulation &amp; dual-tier decoy flow ideation</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
+                <span>UX/UI architecture &amp; feature planning (Quick-Commerce, Decoy Vault, Pre-orders)</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="text-blue-400 mt-0.5 shrink-0">❖</span>
+                <span>Strategic workflow optimization</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <a href="https://www.facebook.com/tarikuzzaman.sabbir.01" target="_blank" rel="noopener noreferrer" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm flex items-center justify-center space-x-2.5 shadow-lg shadow-blue-600/25 border border-blue-400/30 transition-all active:scale-[0.98] cursor-pointer">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <span>Connect with Tarikuzzaman ➜</span>
+        </a>
+      </div>
+
+      <!-- CARD 2: FULL-STACK DEVELOPMENT & AUTOMATION ENGINEERING -->
+      <div class="rounded-3xl bg-slate-900/80 border border-slate-800/90 p-6 sm:p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-cyan-500/40 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/10">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all"></div>
+        
+        <div>
+          <!-- Top Tag & Avatar Monogram -->
+          <div class="flex items-start justify-between gap-4 mb-6">
+            <div class="space-y-1">
+              <span class="inline-block font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-1 rounded-md">
+                Full-Stack &amp; Automation
+              </span>
+              <h2 class="text-xl sm:text-2xl font-black text-white pt-1">Tanvir Kabir</h2>
+              <p class="text-xs sm:text-sm font-semibold text-cyan-300/90 font-mono">Lead Full-Stack Software Engineer</p>
+            </div>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-600 flex items-center justify-center text-slate-950 text-lg sm:text-xl font-mono font-black shadow-lg shadow-cyan-500/20 border border-cyan-300/50 shrink-0">
+              TK
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px w-full bg-slate-800/80 mb-5"></div>
+
+          <!-- Contribution Details -->
+          <div class="space-y-3 mb-8">
+            <p class="font-mono text-[11px] uppercase tracking-wider text-slate-400 font-bold">Key Architectural Contributions:</p>
+            <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300">
+              <li class="flex items-start space-x-2.5">
+                <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
+                <span>Frontend engineering (Responsive Mobile-First UI, Parabolic Fly-to-Cart animations, SPA History routing)</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
+                <span>Headless CMS architecture &amp; custom schema modeling via Sanity.io</span>
+              </li>
+              <li class="flex items-start space-x-2.5">
+                <span class="text-cyan-400 mt-0.5 shrink-0">❖</span>
+                <span>Backend automation, Webhooks &amp; Google Sheets CRM engine</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <a href="https://about.me/tanvir-kabir" target="_blank" rel="noopener noreferrer" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2.5 shadow-lg shadow-cyan-500/25 border border-cyan-300/40 transition-all active:scale-[0.98] cursor-pointer">
+          <svg class="w-4 h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span>Connect with Tanvir ➜</span>
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Architecture Spec Footer -->
+  <footer class="border-t border-slate-800/80 bg-[#080B10]/80 py-6 text-center text-xs text-slate-500 font-mono">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p>Decoy Dual-Tier Headless Engine • Sanity CMS • Client-side SPA Router • Google Apps Script Webhook Pipeline</p>
+      <p>&copy; 2026 Midnight Treats &amp; Xotixs Systems. Proprietary Architecture.</p>
+    </div>
+  </footer>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
 <!--  8. COMPLETE APPLICATION JAVASCRIPT                       -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <script>
@@ -1358,6 +1539,8 @@
     document.getElementById('bakery-ui').style.display      = 'flex';
     document.getElementById('bakery-ui').style.flexDirection = 'column';
     document.getElementById('hidden-chamber').style.display = 'none';
+    var d = document.getElementById('developer-ui');
+    if (d) d.style.display = 'none';
     hideAuthModal();
   }
 
@@ -1365,6 +1548,23 @@
     document.getElementById('bakery-ui').style.display      = 'none';
     document.getElementById('hidden-chamber').style.display = 'flex';
     document.getElementById('hidden-chamber').style.flexDirection = 'column';
+    var d = document.getElementById('developer-ui');
+    if (d) d.style.display = 'none';
+    hideAuthModal();
+    closeProfileDrawer();
+    closeProductDetails();
+    closeBakeryCartModal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showDeveloper() {
+    document.getElementById('bakery-ui').style.display      = 'none';
+    document.getElementById('hidden-chamber').style.display = 'none';
+    var d = document.getElementById('developer-ui');
+    if (d) {
+      d.style.display = 'flex';
+      d.style.flexDirection = 'column';
+    }
     hideAuthModal();
     closeProfileDrawer();
     closeProductDetails();
@@ -2524,7 +2724,10 @@
     var pathname = window.location.pathname;
 
     /* ── DIRECT ROUTE CHECK ── */
-    if (pathname.includes('/secret-menu')) {
+    if (pathname.includes('/developer')) {
+      showDeveloper();
+      loadBakery();
+    } else if (pathname.includes('/secret-menu')) {
       if (isValidSession()) {
         showChamber();
         loadBakery();
@@ -2542,7 +2745,9 @@
     /* ── POPSTATE (Browser Back / Forward) ── */
     window.addEventListener('popstate', function() {
       var currentPath = window.location.pathname;
-      if (currentPath.includes('/secret-menu')) {
+      if (currentPath.includes('/developer')) {
+        showDeveloper();
+      } else if (currentPath.includes('/secret-menu')) {
         if (isValidSession()) {
           showChamber();
           loadChamber();
@@ -2554,6 +2759,16 @@
         showBakery();
       }
     });
+
+    /* ── DEVELOPER RETURN BUTTON ── */
+    var devReturnBtn = document.getElementById('dev-return-btn');
+    if (devReturnBtn) {
+      devReturnBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.history.pushState(null, '', '/');
+        showBakery();
+      });
+    }
 
     /* ── NAVBAR ACTIONS ── */
     document.getElementById('open-auth-btn').addEventListener('click', function() {
