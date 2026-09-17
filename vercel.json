@@ -1,6 +1,8 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
   "rewrites": [
-    { "source": "/studio/:path*", "destination": "/studio/index.html" },
+    { "source": "/studio/((?!static/).*)", "destination": "/studio/index.html" },
     { "source": "/static/:path*", "destination": "/studio/static/:path*" }
   ]
 }
