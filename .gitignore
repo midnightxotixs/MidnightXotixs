@@ -1,0 +1,8 @@
+node_modules/
+.sanity/
+static/
+.env
+.env.local
+.DS_Store
+Thumbs.db
+*.log
