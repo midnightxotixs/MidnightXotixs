@@ -22,8 +22,14 @@ export default defineType({
       name: 'price',
       title: 'Price',
       type: 'string',
-      description: 'e.g. $45.00',
-      validation: (Rule) => Rule.required(),
+      description: 'e.g. $45.00. Leave empty or enter 0 for pre-orders with unknown future pricing (TBD).',
+    }),
+    defineField({
+      name: 'stockQuantity',
+      title: 'Units in Stock',
+      type: 'number',
+      description: 'Enter 0 if out of stock. Leave empty if you want infinite stock.',
+      validation: (Rule) => Rule.min(0),
     }),
     defineField({
       name: 'image',
