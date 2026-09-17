@@ -89,6 +89,17 @@
       pointer-events: none;
     }
 
+    /* Cart tactile pop micro-animation */
+    @keyframes cartBouncePop {
+      0%   { transform: scale(1); }
+      35%  { transform: scale(1.06); }
+      70%  { transform: scale(0.98); }
+      100% { transform: scale(1); }
+    }
+    .cart-bounce-pop {
+      animation: cartBouncePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
     /* Modals & Cyber inputs */
     #preorder-modal { display: none; }
     #product-details-modal { display: none; }
@@ -217,10 +228,10 @@
           <span id="nav-bakery-cart-badge" class="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center shadow-sm">0</span>
         </button>
 
-        <!-- Guest Button: Member Sign In -->
+        <!-- Guest Button: Sign In -->
         <button id="open-auth-btn" class="min-h-[44px] px-4 sm:px-5 py-2 rounded-full bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs sm:text-sm transition-all active:scale-95 flex items-center space-x-1.5 shadow-sm cursor-pointer">
           <svg class="w-3.5 h-3.5 text-pink-200 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-          <span>Member Sign In</span>
+          <span>Sign In</span>
         </button>
 
         <!-- Logged-in Avatar Button (Opens Slide-out Profile Drawer) -->
@@ -315,19 +326,20 @@
 
   <!-- Bakery Floating Bottom Bar for Cart (Mobile friendly) -->
   <div id="bakery-floating-bar" class="fixed bottom-4 inset-x-4 z-40 max-w-md mx-auto hidden-bar" aria-live="polite">
-    <div class="rounded-2xl border border-pink-200/80 bg-white/95 backdrop-blur-md shadow-2xl flex items-center justify-between px-4 py-3 gap-3">
+    <div id="bakery-floating-bar-inner" class="rounded-2xl border border-pink-200/80 bg-white/95 backdrop-blur-md shadow-2xl flex items-center justify-between px-4 py-3 gap-3">
       <div class="flex items-center space-x-3 shrink-0">
         <div class="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center text-xl relative">
           🥐
           <span id="bakery-float-badge" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-mono font-bold flex items-center justify-center">0</span>
         </div>
         <div>
-          <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Bakery Order</p>
+          <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Order</p>
           <p id="bakery-float-total" class="font-bold text-slate-800 text-sm">$0.00</p>
         </div>
       </div>
-      <button id="bakery-float-view-cart-btn" class="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center space-x-1.5 transition-all active:scale-95 cursor-pointer">
-        <span>View Cart &bull; COD</span>
+      <button id="bakery-float-view-cart-btn" class="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center space-x-2 transition-all active:scale-95 cursor-pointer">
+        <span>View Cart</span>
+        <svg class="w-4 h-4 text-pink-200 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         <span>➜</span>
       </button>
     </div>
@@ -337,7 +349,6 @@
   <footer class="mt-auto bg-white/60 border-t border-pink-100 py-6 text-center text-xs text-slate-400">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>&copy; 2026 Midnight Treats Bakery. All rights reserved.</p>
-      <p><a href="#" id="footer-portal-link" class="text-slate-500 hover:text-slate-800 underline">Patron Portal</a></p>
     </div>
   </footer>
 </div>
@@ -1698,7 +1709,7 @@
     var floatTotal = document.getElementById('bakery-float-total');
 
     if (floatBadge) floatBadge.textContent = totalQty;
-    if (floatTotal) floatTotal.textContent = '$' + totalPrice.toFixed(2) + ' (COD)';
+    if (floatTotal) floatTotal.textContent = '$' + totalPrice.toFixed(2);
 
     if (totalQty > 0) {
       if (floatBar) floatBar.classList.remove('hidden-bar');
@@ -1707,21 +1718,135 @@
     }
   }
 
-  function addBakeryItemToCart(item, qty) {
-    var id = item._id || item.title;
-    if (!bakeryCart[id]) {
-      bakeryCart[id] = {
-        id: id,
-        title: item.title,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        qty: 0
-      };
+  /* ── REALISTIC FLY-TO-BASKET PARABOLIC ANIMATION ── */
+  function flyToCart(sourceEl, onComplete) {
+    var floatBar = document.getElementById('bakery-floating-bar');
+    var innerBar = document.getElementById('bakery-floating-bar-inner') || floatBar;
+    var targetEl = document.getElementById('bakery-float-badge') || floatBar;
+
+    if (!sourceEl) {
+      if (onComplete) onComplete();
+      return;
     }
-    bakeryCart[id].qty += (qty || 1);
-    saveBakeryCart();
-    updateBakeryCartUI();
-    showToast('🥐 Added ' + (qty || 1) + 'x ' + item.title + ' to Basket', 'blue');
+
+    // Reveal floating cart bar if hidden so target is visible
+    if (floatBar && floatBar.classList.contains('hidden-bar')) {
+      floatBar.classList.remove('hidden-bar');
+    }
+
+    var startRect = sourceEl.getBoundingClientRect();
+    var targetRect = targetEl ? targetEl.getBoundingClientRect() : null;
+
+    if (!targetRect || startRect.width === 0 || startRect.height === 0) {
+      if (onComplete) onComplete();
+      return;
+    }
+
+    // Spawn cloned thumbnail at exact coordinates
+    var clone;
+    if (sourceEl.tagName === 'IMG') {
+      clone = document.createElement('img');
+      clone.src = sourceEl.src;
+      clone.alt = sourceEl.alt || 'Product';
+      clone.className = 'object-cover';
+    } else {
+      clone = sourceEl.cloneNode(true);
+      clone.id = '';
+    }
+
+    clone.style.position = 'fixed';
+    clone.style.top = startRect.top + 'px';
+    clone.style.left = startRect.left + 'px';
+    clone.style.width = startRect.width + 'px';
+    clone.style.height = startRect.height + 'px';
+    clone.style.margin = '0';
+    clone.style.zIndex = '9999';
+    clone.style.pointerEvents = 'none';
+    clone.style.borderRadius = '1.25rem';
+    clone.style.border = '2px solid rgba(255, 255, 255, 0.9)';
+    clone.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.25)';
+    clone.style.transformOrigin = 'center center';
+
+    document.body.appendChild(clone);
+
+    var startCenterX = startRect.left + startRect.width / 2;
+    var startCenterY = startRect.top + startRect.height / 2;
+    var targetCenterX = targetRect.left + targetRect.width / 2;
+    var targetCenterY = targetRect.top + targetRect.height / 2;
+
+    var deltaX = targetCenterX - startCenterX;
+    var deltaY = targetCenterY - startCenterY;
+
+    // Curved parabolic trajectory over 650ms via Web Animations API
+    var animation = clone.animate([
+      {
+        transform: 'translate3d(0, 0, 0) scale(1) rotate(0deg)',
+        opacity: 1
+      },
+      {
+        offset: 0.35,
+        transform: 'translate3d(' + (deltaX * 0.35) + 'px, ' + (deltaY * 0.15 - 35) + 'px, 0) scale(0.8) rotate(-6deg)',
+        opacity: 0.95
+      },
+      {
+        offset: 0.7,
+        transform: 'translate3d(' + (deltaX * 0.75) + 'px, ' + (deltaY * 0.65) + 'px, 0) scale(0.45) rotate(4deg)',
+        opacity: 0.8
+      },
+      {
+        transform: 'translate3d(' + deltaX + 'px, ' + deltaY + 'px, 0) scale(0.2) rotate(0deg)',
+        opacity: 0.2
+      }
+    ], {
+      duration: 650,
+      easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+      fill: 'forwards'
+    });
+
+    var finishDone = false;
+    var handleFinish = function() {
+      if (finishDone) return;
+      finishDone = true;
+      if (clone.parentNode) clone.parentNode.removeChild(clone);
+
+      // Tactile pop/bounce micro-animation on floating cart bar
+      if (innerBar) {
+        innerBar.classList.remove('cart-bounce-pop');
+        void innerBar.offsetWidth; // force reflow
+        innerBar.classList.add('cart-bounce-pop');
+      }
+
+      if (onComplete) onComplete();
+    };
+
+    animation.onfinish = handleFinish;
+    animation.onerror  = handleFinish;
+    setTimeout(handleFinish, 750); // safety fallback
+  }
+
+  function addBakeryItemToCart(item, qty, sourceEl) {
+    var executeAdd = function() {
+      var id = item._id || item.title;
+      if (!bakeryCart[id]) {
+        bakeryCart[id] = {
+          id: id,
+          title: item.title,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          qty: 0
+        };
+      }
+      bakeryCart[id].qty += (qty || 1);
+      saveBakeryCart();
+      updateBakeryCartUI();
+      showToast('🥐 Added ' + (qty || 1) + 'x ' + item.title + ' to Basket', 'blue');
+    };
+
+    if (sourceEl) {
+      flyToCart(sourceEl, executeAdd);
+    } else {
+      executeAdd();
+    }
   }
 
   function proceedToBakeryCheckout() {
@@ -1880,7 +2005,9 @@
         b.addEventListener('click', function(e) {
           e.stopPropagation();
           var idx = b.dataset.idx;
-          if (allBakeryItems[idx]) addBakeryItemToCart(allBakeryItems[idx], 1);
+          var card = b.closest('#bakery-card-' + idx) || b.closest('.group') || b.parentElement.parentElement;
+          var imgEl = card ? (card.querySelector('img') || card.querySelector('.h-36') || card) : null;
+          if (allBakeryItems[idx]) addBakeryItemToCart(allBakeryItems[idx], 1, imgEl);
         });
       });
 
@@ -2441,15 +2568,6 @@
     var floatViewCartBtn = document.getElementById('bakery-float-view-cart-btn');
     if (floatViewCartBtn) floatViewCartBtn.addEventListener('click', openBakeryCartModal);
 
-    var footerLink = document.getElementById('footer-portal-link');
-    if (footerLink) {
-      footerLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        var u = getBakeryUser();
-        if (u && u.loggedIn) openProfileDrawer(); else showAuthModal('login');
-      });
-    }
-
     /* ── AUTH MODAL TABS ── */
     document.getElementById('close-modal-btn').addEventListener('click', hideAuthModal);
     document.getElementById('auth-modal').addEventListener('click', function(e) {
@@ -2730,7 +2848,8 @@
         var actionText = pricing.isPreorder ? 'Pre-ordered' : 'Added';
         showToast('⚡ ' + actionText + ' ' + detailQuantity + 'x ' + currentDetailItem.title + ' to Stash', 'blue');
       } else {
-        addBakeryItemToCart(currentDetailItem, detailQuantity);
+        var pdetailImg = document.getElementById('pdetail-img-container').querySelector('img') || document.getElementById('pdetail-img-container');
+        addBakeryItemToCart(currentDetailItem, detailQuantity, pdetailImg);
       }
       closeProductDetails();
     });
