@@ -29,80 +29,100 @@
   </script>
 
   <style>
-    /* ── General ────────────────────────────────────────── */
     :root {
-      --bg-dark: #0A0D14;
-      --bg-card: rgba(15,20,32,0.85);
-      --border-glow-red:    rgba(239,68,68,.5);
-      --border-glow-blue:   rgba(6,182,212,.5);
-      --border-glow-green:  rgba(16,185,129,.5);
-      --border-glow-purple: rgba(168,85,247,.5);
-      --border-glow-amber:  rgba(245,158,11,.5);
+      --bg-dark:#0A0D14;
+      --border-glow-red:rgba(239,68,68,.5);
+      --border-glow-blue:rgba(6,182,212,.5);
+      --border-glow-green:rgba(16,185,129,.5);
+      --border-glow-purple:rgba(168,85,247,.5);
+      --border-glow-amber:rgba(245,158,11,.5);
     }
-    body { background-color: #FAF7F2; font-family: 'Plus Jakarta Sans', sans-serif; color: #334155; }
-    .heading-serif { font-family: 'Playfair Display', serif; }
+    /* ── Prevent FOUC: hide both panes by default; inline script reveals correct one ── */
+    #bakery-ui    { display:none; }
+    #hidden-chamber { display:none; }
 
-    /* ── Scrollbar hide ─────────────────────────────────── */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body { background-color:#FAF7F2; font-family:'Plus Jakarta Sans',sans-serif; color:#334155; }
+    .heading-serif { font-family:'Playfair Display',serif; }
 
-    /* ── Skeleton shimmer ───────────────────────────────── */
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+
     @keyframes shimmer {
-      0%   { background-position: -200% 0; }
-      100% { background-position:  200% 0; }
+      0%   { background-position:-200% 0; }
+      100% { background-position:200% 0; }
     }
     .skeleton {
-      background: linear-gradient(90deg,#f0ebe4 25%,#faf7f2 50%,#f0ebe4 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+      background:linear-gradient(90deg,#f0ebe4 25%,#faf7f2 50%,#f0ebe4 75%);
+      background-size:200% 100%;
+      animation:shimmer 1.5s infinite;
       border-radius:.75rem;
     }
     .skeleton-dark {
-      background: linear-gradient(90deg,#131926 25%,#0d1220 50%,#131926 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.6s infinite;
+      background:linear-gradient(90deg,#131926 25%,#0d1220 50%,#131926 75%);
+      background-size:200% 100%;
+      animation:shimmer 1.6s infinite;
       border-radius:.75rem;
     }
 
-    /* ── Neon glow helpers ──────────────────────────────── */
-    .neon-red    { border-color: var(--border-glow-red);    box-shadow: 0 0 16px var(--border-glow-red);    }
-    .neon-blue   { border-color: var(--border-glow-blue);   box-shadow: 0 0 16px var(--border-glow-blue);   }
-    .neon-green  { border-color: var(--border-glow-green);  box-shadow: 0 0 16px var(--border-glow-green);  }
-    .neon-purple { border-color: var(--border-glow-purple); box-shadow: 0 0 16px var(--border-glow-purple); }
-    .neon-amber  { border-color: var(--border-glow-amber);  box-shadow: 0 0 16px var(--border-glow-amber);  }
+    /* Neon glow helpers */
+    .neon-red    { border-color:var(--border-glow-red);    box-shadow:0 0 16px var(--border-glow-red);    }
+    .neon-blue   { border-color:var(--border-glow-blue);   box-shadow:0 0 16px var(--border-glow-blue);   }
+    .neon-green  { border-color:var(--border-glow-green);  box-shadow:0 0 16px var(--border-glow-green);  }
+    .neon-purple { border-color:var(--border-glow-purple); box-shadow:0 0 16px var(--border-glow-purple); }
+    .neon-amber  { border-color:var(--border-glow-amber);  box-shadow:0 0 16px var(--border-glow-amber);  }
 
-    .pill-active-red    { background-color: rgba(239,68,68,.15);    color: rgb(252,165,165); border-color: var(--border-glow-red);    }
-    .pill-active-blue   { background-color: rgba(6,182,212,.15);    color: rgb(103,232,249); border-color: var(--border-glow-blue);   }
-    .pill-active-green  { background-color: rgba(16,185,129,.15);   color: rgb(110,231,183); border-color: var(--border-glow-green);  }
-    .pill-active-purple { background-color: rgba(168,85,247,.15);   color: rgb(216,180,254); border-color: var(--border-glow-purple); }
-    .pill-active-amber  { background-color: rgba(245,158,11,.15);   color: rgb(252,211,77);  border-color: var(--border-glow-amber);  }
-
-    /* ── Qty stepper transition ─────────────────────────── */
-    .qty-add   { transition: all .2s ease; }
-    .qty-step  { transition: all .2s ease; }
-
-    /* ── Checkout bar slide-up ──────────────────────────── */
-    #checkout-bar {
-      transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease;
-    }
-    #checkout-bar.hidden-bar {
-      transform: translateY(100%);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* ── Safe area for mobile bottom ────────────────────── */
-    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    /* Checkout bar slide */
+    #checkout-bar { transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease; }
+    #checkout-bar.hidden-bar { transform:translateY(100%); opacity:0; pointer-events:none; }
+    .pb-safe { padding-bottom:env(safe-area-inset-bottom,16px); }
   </style>
+
+  <!--
+    ███████████████████████████████████████████████████████████
+    ANTI-FLICKER SESSION GATE — runs synchronously before paint
+    ███████████████████████████████████████████████████████████
+    Reads localStorage immediately and sets the correct initial
+    display state so there is zero flash of the wrong page.
+  -->
+  <script>
+    (function() {
+      try {
+        var raw = localStorage.getItem('xotixs_session');
+        if (raw) {
+          var sess = JSON.parse(raw);
+          if (sess && sess.authenticated && Date.now() < sess.expiresAt) {
+            // Valid session → prepare to show chamber, not bakery
+            document.addEventListener('DOMContentLoaded', function() {
+              document.getElementById('bakery-ui').style.display      = 'none';
+              document.getElementById('hidden-chamber').style.display = 'flex';
+              document.getElementById('hidden-chamber').style.flexDirection = 'column';
+              document.getElementById('hidden-chamber').style.minHeight = '100vh';
+            });
+            // Mark so main script knows to skip auth
+            window.__xotixs_authed = true;
+            return;
+          } else {
+            localStorage.removeItem('xotixs_session');
+            localStorage.removeItem('xotixs_cart');
+          }
+        }
+      } catch(e) {}
+      // No valid session → show bakery
+      document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('bakery-ui').style.display = 'flex';
+        document.getElementById('bakery-ui').style.flexDirection = 'column';
+        document.getElementById('bakery-ui').style.minHeight = '100vh';
+      });
+    })();
+  </script>
 </head>
 <body class="min-h-screen antialiased">
 
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  1. BAKERY DECOY FRONT                                     -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="bakery-ui" class="min-h-screen flex flex-col bg-[#FAF7F2]">
+<div id="bakery-ui" class="flex-col bg-[#FAF7F2]">
 
-  <!-- Header -->
   <header class="sticky top-0 z-30 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-pink-100">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
       <a href="#" class="flex items-center space-x-2.5 group">
@@ -119,7 +139,6 @@
     </div>
   </header>
 
-  <!-- Hero -->
   <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 sm:pt-20 sm:pb-28 w-full">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
       <div class="lg:col-span-7 space-y-5">
@@ -161,7 +180,6 @@
     </div>
   </section>
 
-  <!-- Bakery Menu -->
   <section id="menu" class="max-w-6xl mx-auto px-4 sm:px-6 py-12 border-t border-pink-100/60 w-full">
     <div class="text-center space-y-2 mb-10">
       <span class="text-xs uppercase font-bold tracking-widest text-slate-400">Handcrafted Daily</span>
@@ -175,7 +193,6 @@
     </div>
   </section>
 
-  <!-- Footer -->
   <footer class="mt-auto bg-white/60 border-t border-pink-100 py-6 text-center text-xs text-slate-400">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p>&copy; 2026 Midnight Treats Bakery. All rights reserved.</p>
@@ -188,58 +205,78 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  2. AUTH MODAL                                            -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="auth-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+<div id="auth-modal" class="fixed inset-0 z-50 items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm" style="display:none;">
   <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-pink-100 max-w-md w-full p-6 sm:p-8 relative">
     <button id="close-modal-btn" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full w-9 h-9 flex items-center justify-center transition-colors" aria-label="Close">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
 
-    <!-- Login View -->
+    <!-- LOGIN VIEW -->
     <div id="login-view" class="space-y-5">
-      <div><div class="w-9 h-9 rounded-xl bg-[#FCE4EC] flex items-center justify-center text-lg mb-3">🥐</div>
+      <div>
+        <div class="w-9 h-9 rounded-xl bg-[#FCE4EC] flex items-center justify-center text-lg mb-3">🥐</div>
         <h2 class="heading-serif text-xl sm:text-2xl font-bold text-slate-800">Member Sign In</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Access your pastry subscriptions and seasonal allocations.</p></div>
-      <div id="login-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2">
+        <p class="text-xs text-slate-500 mt-0.5">Access your pastry subscriptions and seasonal allocations.</p>
+      </div>
+      <div id="login-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2" style="display:none;">
         <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <span>Account not found. Please register as an authorized member first.</span></div>
+        <span>Account not found. Please register as an authorized member first.</span>
+      </div>
       <form id="login-form" class="space-y-3">
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1.5" for="login-email">Email Address</label>
-          <input type="email" id="login-email" required placeholder="baker@midnighttreats.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm bg-slate-50/50 min-h-[44px]"/></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1.5" for="login-password">Password</label>
-          <input type="password" id="login-password" required placeholder="••••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm bg-slate-50/50 min-h-[44px]"/></div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="baker@midnighttreats.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm bg-slate-50/50 min-h-[44px]"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-200 text-sm bg-slate-50/50 min-h-[44px]"/>
+        </div>
         <button type="submit" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm transition-colors active:scale-[0.99] min-h-[44px]">Sign In</button>
       </form>
       <div class="text-center pt-1 border-t border-slate-100">
-        <p class="text-xs text-slate-500">Don't have an account? <button id="go-to-register-btn" class="font-semibold text-slate-800 hover:text-pink-600 underline ml-1">Register here</button></p></div>
+        <p class="text-xs text-slate-500">Don't have an account? <button id="go-to-register-btn" class="font-semibold text-slate-800 hover:text-pink-600 underline ml-1">Register here</button></p>
+      </div>
     </div>
 
-    <!-- Register View -->
-    <div id="register-view" class="space-y-5 hidden">
-      <div><div class="w-9 h-9 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-lg mb-3">🗝️</div>
+    <!-- REGISTER VIEW -->
+    <div id="register-view" class="space-y-5" style="display:none;">
+      <div>
+        <div class="w-9 h-9 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-lg mb-3">🗝️</div>
         <h2 class="heading-serif text-xl sm:text-2xl font-bold text-slate-800">Register / Become a Member</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Enter your credentials and invitation pass.</p></div>
-      <div id="register-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2">
+        <p class="text-xs text-slate-500 mt-0.5">Enter your credentials and invitation pass.</p>
+      </div>
+      <div id="register-error" class="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start space-x-2" style="display:none;">
         <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-        <span id="register-error-text">Invalid or expired invitation pass.</span></div>
+        <span id="register-error-text">Invalid or expired invitation pass.</span>
+      </div>
       <form id="register-form" class="space-y-3">
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1.5" for="reg-name">Full Name</label>
-          <input type="text" id="reg-name" required placeholder="Evelyn Harper" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 text-sm bg-slate-50/50 min-h-[44px]"/></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1.5" for="reg-email">Email Address</label>
-          <input type="email" id="reg-email" required placeholder="evelyn@domain.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 text-sm bg-slate-50/50 min-h-[44px]"/></div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="reg-name">Full Name</label>
+          <input type="text" id="reg-name" required placeholder="Evelyn Harper" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 text-sm bg-slate-50/50 min-h-[44px]"/>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5" for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" required placeholder="evelyn@domain.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200 text-sm bg-slate-50/50 min-h-[44px]"/>
+        </div>
         <div>
           <div class="flex items-center justify-between mb-1.5">
             <label class="text-xs font-semibold text-slate-700" for="reg-passcode">Invitation Pass / Membership Code</label>
-            <span class="text-[10px] text-slate-400 font-mono">CONFIDENTIAL</span></div>
+            <span class="text-[10px] text-slate-400 font-mono">CONFIDENTIAL</span>
+          </div>
           <input type="text" id="reg-passcode" required placeholder="e.g. PASS-XXXXX" autocomplete="off" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono tracking-wider text-sm bg-slate-50/50 min-h-[44px]"/>
-          <p class="text-[11px] text-slate-400 mt-1">Single-use pass verified via encrypted protocol.</p></div>
+          <p class="text-[11px] text-slate-400 mt-1">Single-use pass verified via encrypted protocol.</p>
+        </div>
         <button type="submit" id="register-submit-btn" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm transition-colors active:scale-[0.99] flex items-center justify-center space-x-2 min-h-[44px]">
-          <svg id="register-btn-spinner" class="animate-spin h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg id="register-btn-spinner" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="display:none;">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-          <span id="register-btn-text">Complete Registration</span></button>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span id="register-btn-text">Complete Registration</span>
+        </button>
       </form>
       <div class="text-center pt-1 border-t border-slate-100">
-        <p class="text-xs text-slate-500">Already a member? <button id="go-to-login-btn" class="font-semibold text-slate-800 hover:text-sky-600 underline ml-1">Sign In here</button></p></div>
+        <p class="text-xs text-slate-500">Already a member? <button id="go-to-login-btn" class="font-semibold text-slate-800 hover:text-sky-600 underline ml-1">Sign In here</button></p>
+      </div>
     </div>
   </div>
 </div>
@@ -248,9 +285,9 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  3. MIDNIGHT XOTIXS — CYBERPUNK QUICK-COMMERCE CHAMBER   -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="hidden-chamber" class="min-h-screen w-full flex flex-col hidden" style="background-color:#0A0D14;">
+<div id="hidden-chamber" class="flex-col w-full" style="min-height:100vh;background-color:#0A0D14;">
 
-  <!-- ── Sticky Topbar ─────────────────────────────────────── -->
+  <!-- Sticky Topbar -->
   <header class="sticky top-0 z-40 border-b border-slate-800/80" style="background-color:rgba(10,13,20,0.95);backdrop-filter:blur(16px);">
     <div class="max-w-5xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -267,14 +304,13 @@
         </div>
         <button id="relock-btn" class="min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-red-950/40 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 text-xs font-mono transition-all active:scale-95 flex items-center space-x-1.5">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          <span>Exit</span>
+          <span>Exit &amp; Lock</span>
         </button>
       </div>
     </div>
 
-    <!-- ── Sticky Category Pills ──────────────────────────── -->
+    <!-- Sticky Category Pills -->
     <div id="category-bar" class="max-w-5xl mx-auto px-4 py-2 flex space-x-2 overflow-x-auto no-scrollbar border-t border-slate-800/60">
-      <!-- Injected by JS -->
       <div class="skeleton-dark h-8 w-12 rounded-full shrink-0"></div>
       <div class="skeleton-dark h-8 w-20 rounded-full shrink-0"></div>
       <div class="skeleton-dark h-8 w-16 rounded-full shrink-0"></div>
@@ -282,23 +318,18 @@
     </div>
   </header>
 
-  <!-- ── Main Catalog ──────────────────────────────────────── -->
-  <main id="chamber-main" class="flex-grow max-w-5xl mx-auto w-full px-4 py-6 pb-28 space-y-10">
-
-    <!-- Loading skeleton rows while fetching -->
+  <!-- Main Catalog -->
+  <main id="chamber-main" class="flex-grow max-w-5xl mx-auto w-full px-4 py-6 pb-32 space-y-10">
     <div id="chamber-skeleton" class="space-y-4">
       <div class="skeleton-dark h-6 w-32 rounded mb-6"></div>
       <div class="skeleton-dark h-24 w-full rounded-2xl"></div>
       <div class="skeleton-dark h-24 w-full rounded-2xl"></div>
       <div class="skeleton-dark h-24 w-full rounded-2xl"></div>
     </div>
-
-    <!-- Dynamic product sections injected here by JS -->
-    <div id="product-sections" class="hidden space-y-12"></div>
-
+    <div id="product-sections" class="space-y-12" style="display:none;"></div>
   </main>
 
-  <!-- ── Floating Checkout Bar ─────────────────────────────── -->
+  <!-- Floating Checkout Bar -->
   <div id="checkout-bar" class="fixed bottom-4 inset-x-4 z-50 max-w-lg mx-auto hidden-bar" aria-live="polite">
     <div class="rounded-2xl border border-slate-700 flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4" style="background:rgba(15,20,32,0.98);backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);">
       <div class="flex items-center space-x-3">
@@ -325,314 +356,378 @@
 
 
 <!-- ══════════════════════════════════════════════════════════ -->
-<!--  4. JAVASCRIPT — SANITY + QUICK COMMERCE ENGINE          -->
+<!--  4. JAVASCRIPT                                            -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <script>
   /* ═══════════════════════════════════════════════════════════
      SANITY CONFIG
   ═══════════════════════════════════════════════════════════ */
-  const SANITY_PROJECT_ID  = "9qdzkhb5";
-  const SANITY_DATASET     = "production";
-  const SANITY_API_VERSION = "2024-01-01";
-  const SANITY_WRITE_TOKEN = "skjo7VQZwtVNCSBWf3rShfA68Ho8S4t3Qgo23isdlh3oQCLpfqawBod2LCYeBEiThoNwHVOFFE5jzybeYTrsBMmY4ir0w0YDumJ126qnHZoGdEv1MeVDBjQmHWyWIfXZDknzGkpPiOK7ej0POMcHsvKvr3y2449RBs1YrFyMZTO83fQW2SrS";
+  var SANITY_PROJECT_ID  = "9qdzkhb5";
+  var SANITY_DATASET     = "production";
+  var SANITY_API_VERSION = "2024-01-01";
+  var SANITY_WRITE_TOKEN = "skjo7VQZwtVNCSBWf3rShfA68Ho8S4t3Qgo23isdlh3oQCLpfqawBod2LCYeBEiThoNwHVOFFE5jzybeYTrsBMmY4ir0w0YDumJ126qnHZoGdEv1MeVDBjQmHWyWIfXZDknzGkpPiOK7ej0POMcHsvKvr3y2449RBs1YrFyMZTO83fQW2SrS";
+
+  var SESSION_KEY = 'xotixs_session';
+  var CART_KEY    = 'xotixs_cart';
+  var SESSION_TTL = 3 * 60 * 60 * 1000; // 3 hours
 
   /* ═══════════════════════════════════════════════════════════
-     GROQ FETCH HELPER
+     SESSION HELPERS
+  ═══════════════════════════════════════════════════════════ */
+  function saveSession() {
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        authenticated: true,
+        expiresAt: Date.now() + SESSION_TTL
+      }));
+    } catch(e) {}
+  }
+
+  function clearSession() {
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(CART_KEY);
+    } catch(e) {}
+  }
+
+  function isSessionValid() {
+    try {
+      var raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      return s && s.authenticated && Date.now() < s.expiresAt;
+    } catch(e) { return false; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CART PERSISTENCE
+  ═══════════════════════════════════════════════════════════ */
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e) {}
+  }
+
+  function loadCart() {
+    try {
+      var raw = localStorage.getItem(CART_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     GROQ FETCH
   ═══════════════════════════════════════════════════════════ */
   async function sanityFetch(query) {
-    const url = `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/query/${SANITY_DATASET}?query=${encodeURIComponent(query)}`;
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${SANITY_WRITE_TOKEN}` } });
-    if (!res.ok) throw new Error(`Sanity: ${res.statusText}`);
+    var url = 'https://' + SANITY_PROJECT_ID + '.api.sanity.io/v' + SANITY_API_VERSION + '/data/query/' + SANITY_DATASET + '?query=' + encodeURIComponent(query);
+    var res = await fetch(url, { headers: { Authorization: 'Bearer ' + SANITY_WRITE_TOKEN } });
+    if (!res.ok) throw new Error('Sanity: ' + res.statusText);
     return (await res.json()).result;
   }
 
   /* ═══════════════════════════════════════════════════════════
      APP STATE
   ═══════════════════════════════════════════════════════════ */
-  let cart = {};            // { productId: { title, price, qty } }
-  let activeCategory = 'all';
-  let allProducts    = [];
-  let allCategories  = [];
-  let orderChatUrl   = '';
-  let chamberLoaded  = false;
+  var cart           = {};
+  var activeCategory = 'all';
+  var allProducts    = [];
+  var allCategories  = [];
+  var orderChatUrl   = '';
+  var chamberLoaded  = false;
 
   /* ═══════════════════════════════════════════════════════════
      COLOR THEME MAP
   ═══════════════════════════════════════════════════════════ */
-  const THEMES = {
-    red:    { border:'rgba(239,68,68,.5)',   glow:'rgba(239,68,68,.25)',   text:'#fca5a5', pillBg:'rgba(239,68,68,.12)',   btnBg:'rgba(239,68,68,.9)',  btnText:'#fff',     sectionHead:'#ef4444' },
-    blue:   { border:'rgba(6,182,212,.5)',   glow:'rgba(6,182,212,.25)',   text:'#67e8f9', pillBg:'rgba(6,182,212,.12)',   btnBg:'rgba(6,182,212,.9)', btnText:'#0f172a',  sectionHead:'#22d3ee' },
-    green:  { border:'rgba(16,185,129,.5)',  glow:'rgba(16,185,129,.25)',  text:'#6ee7b7', pillBg:'rgba(16,185,129,.12)',  btnBg:'rgba(16,185,129,.9)',btnText:'#0f172a',  sectionHead:'#10b981' },
-    purple: { border:'rgba(168,85,247,.5)',  glow:'rgba(168,85,247,.25)',  text:'#d8b4fe', pillBg:'rgba(168,85,247,.12)',  btnBg:'rgba(168,85,247,.9)',btnText:'#fff',     sectionHead:'#a855f7' },
-    amber:  { border:'rgba(245,158,11,.5)',  glow:'rgba(245,158,11,.25)',  text:'#fcd34d', pillBg:'rgba(245,158,11,.12)',  btnBg:'rgba(245,158,11,.9)',btnText:'#0f172a',  sectionHead:'#f59e0b' },
+  var THEMES = {
+    red:    { border:'rgba(239,68,68,.5)',   glow:'rgba(239,68,68,.25)',   text:'#fca5a5', pillBg:'rgba(239,68,68,.12)',   btnBg:'rgba(239,68,68,.9)',  btnText:'#fff',    sectionHead:'#ef4444' },
+    blue:   { border:'rgba(6,182,212,.5)',   glow:'rgba(6,182,212,.25)',   text:'#67e8f9', pillBg:'rgba(6,182,212,.12)',   btnBg:'rgba(6,182,212,.9)', btnText:'#0f172a', sectionHead:'#22d3ee' },
+    green:  { border:'rgba(16,185,129,.5)',  glow:'rgba(16,185,129,.25)',  text:'#6ee7b7', pillBg:'rgba(16,185,129,.12)',  btnBg:'rgba(16,185,129,.9)',btnText:'#0f172a', sectionHead:'#10b981' },
+    purple: { border:'rgba(168,85,247,.5)',  glow:'rgba(168,85,247,.25)',  text:'#d8b4fe', pillBg:'rgba(168,85,247,.12)',  btnBg:'rgba(168,85,247,.9)',btnText:'#fff',    sectionHead:'#a855f7' },
+    amber:  { border:'rgba(245,158,11,.5)',  glow:'rgba(245,158,11,.25)',  text:'#fcd34d', pillBg:'rgba(245,158,11,.12)',  btnBg:'rgba(245,158,11,.9)',btnText:'#0f172a', sectionHead:'#f59e0b' },
   };
-  const theme = (color) => THEMES[color] || THEMES.blue;
+  function theme(color) { return THEMES[color] || THEMES.blue; }
 
   /* ═══════════════════════════════════════════════════════════
-     BAKERY PAGE — SITE SETTINGS + PRODUCTS
+     SHOW / HIDE HELPERS (using style.display — no class battles)
   ═══════════════════════════════════════════════════════════ */
-  async function loadBakery() {
-    try {
-      const [settings, products] = await Promise.all([
-        sanityFetch(`*[_type == "siteSettings"][0]{ siteName, heroTitle, heroSubtitle, orderChatUrl }`),
-        sanityFetch(`*[_type == "bakeryProduct"]{ title, description, price, "imageUrl": image.asset->url }`)
-      ]);
+  function showBakery() {
+    document.getElementById('bakery-ui').style.display      = 'flex';
+    document.getElementById('hidden-chamber').style.display = 'none';
+    document.getElementById('auth-modal').style.display     = 'none';
+  }
 
-      if (settings) {
-        if (settings.siteName)    document.getElementById('nav-site-name').textContent = settings.siteName;
-        if (settings.heroTitle)   document.getElementById('hero-title').innerHTML = settings.heroTitle;
-        if (settings.heroSubtitle)document.getElementById('hero-subtitle').textContent = settings.heroSubtitle;
-        if (settings.orderChatUrl) orderChatUrl = settings.orderChatUrl;
-      }
+  function showChamber() {
+    document.getElementById('bakery-ui').style.display      = 'none';
+    document.getElementById('hidden-chamber').style.display = 'flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
-      const grid = document.getElementById('bakery-product-grid');
-      if (!products || products.length === 0) {
-        grid.innerHTML = `<p class="col-span-3 text-center text-slate-400 font-mono text-sm py-12">No products yet. Add via Sanity Studio.</p>`;
-        return;
-      }
-      grid.innerHTML = products.map(p => `
-        <div class="bg-white rounded-2xl sm:rounded-3xl p-5 border border-slate-100 shadow-sm hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-          <div>
-            ${p.imageUrl
-              ? `<img src="${p.imageUrl}" alt="${p.title}" class="w-full h-36 object-cover rounded-xl mb-4 border border-slate-100"/>`
-              : `<div class="h-36 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#FCE4EC]/50 flex items-center justify-center text-6xl mb-4">🥐</div>`}
-            <div class="space-y-1">
-              <div class="flex items-center justify-between gap-2">
-                <h3 class="heading-serif text-lg font-bold text-slate-800 leading-tight">${p.title}</h3>
-                <span class="text-sm font-bold text-slate-700 bg-[#FAF7F2] px-2 py-0.5 rounded-lg border border-slate-100 shrink-0">${p.price}</span>
-              </div>
-              <p class="text-xs text-slate-500 leading-relaxed">${p.description || ''}</p>
-            </div>
-          </div>
-          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Fresh Batch</span>
-            <button onclick="document.getElementById('open-auth-btn').click()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 group-hover:underline min-h-[36px]">Order &rarr;</button>
-          </div>
-        </div>`).join('');
-    } catch(e) {
-      console.error('Bakery load:', e);
-    }
+  function showModal(view) {
+    document.getElementById('auth-modal').style.display = 'flex';
+    resetForms();
+    if (view === 'register') { showRegView(); } else { showLoginView(); }
+  }
+  function hideModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+    resetForms();
+  }
+  function showLoginView() {
+    document.getElementById('login-view').style.display    = 'block';
+    document.getElementById('register-view').style.display = 'none';
+    document.getElementById('login-error').style.display   = 'none';
+  }
+  function showRegView() {
+    document.getElementById('register-view').style.display = 'block';
+    document.getElementById('login-view').style.display    = 'none';
+    document.getElementById('register-error').style.display = 'none';
+  }
+  function resetForms() {
+    document.getElementById('login-form').reset();
+    document.getElementById('register-form').reset();
+    document.getElementById('login-error').style.display    = 'none';
+    document.getElementById('register-error').style.display = 'none';
+    setLoading(false);
+  }
+  function setLoading(on) {
+    document.getElementById('register-submit-btn').disabled = on;
+    document.getElementById('register-btn-spinner').style.display = on ? 'inline-block' : 'none';
+    document.getElementById('register-btn-text').textContent = on ? 'Verifying...' : 'Complete Registration';
   }
 
   /* ═══════════════════════════════════════════════════════════
-     CHAMBER — FETCH CATEGORIES + PRODUCTS + SETTINGS
+     BAKERY — SETTINGS + PRODUCTS
+  ═══════════════════════════════════════════════════════════ */
+  async function loadBakery() {
+    try {
+      var results = await Promise.all([
+        sanityFetch('*[_type == "siteSettings"][0]{ siteName, heroTitle, heroSubtitle, orderChatUrl }'),
+        sanityFetch('*[_type == "bakeryProduct"]{ title, description, price, "imageUrl": image.asset->url }')
+      ]);
+      var settings = results[0], products = results[1];
+
+      if (settings) {
+        if (settings.siteName)     document.getElementById('nav-site-name').textContent = settings.siteName;
+        if (settings.heroTitle)    document.getElementById('hero-title').innerHTML      = settings.heroTitle;
+        if (settings.heroSubtitle) document.getElementById('hero-subtitle').textContent = settings.heroSubtitle;
+        if (settings.orderChatUrl) orderChatUrl = settings.orderChatUrl;
+      }
+
+      var grid = document.getElementById('bakery-product-grid');
+      if (!products || products.length === 0) {
+        grid.innerHTML = '<p class="col-span-3 text-center text-slate-400 font-mono text-sm py-12">No products yet. Add via Sanity Studio.</p>';
+        return;
+      }
+      grid.innerHTML = products.map(function(p) {
+        return '<div class="bg-white rounded-2xl sm:rounded-3xl p-5 border border-slate-100 shadow-sm hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">' +
+          '<div>' +
+          (p.imageUrl
+            ? '<img src="' + p.imageUrl + '" alt="' + p.title + '" class="w-full h-36 object-cover rounded-xl mb-4 border border-slate-100"/>'
+            : '<div class="h-36 rounded-xl bg-gradient-to-br from-[#FAF7F2] to-[#FCE4EC]/50 flex items-center justify-center text-6xl mb-4">🥐</div>') +
+          '<div class="space-y-1"><div class="flex items-center justify-between gap-2">' +
+          '<h3 class="heading-serif text-lg font-bold text-slate-800 leading-tight">' + p.title + '</h3>' +
+          '<span class="text-sm font-bold text-slate-700 bg-[#FAF7F2] px-2 py-0.5 rounded-lg border border-slate-100 shrink-0">' + p.price + '</span>' +
+          '</div><p class="text-xs text-slate-500 leading-relaxed">' + (p.description || '') + '</p></div></div>' +
+          '<div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">' +
+          '<span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Fresh Batch</span>' +
+          '<button onclick="document.getElementById(\'open-auth-btn\').click()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 min-h-[36px]">Order &rarr;</button>' +
+          '</div></div>';
+      }).join('');
+    } catch(e) { console.error('Bakery load:', e); }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CHAMBER — LOAD DATA
   ═══════════════════════════════════════════════════════════ */
   async function loadChamber() {
-    if (chamberLoaded) { renderCategoryBar(); renderProductSections(); return; }
+    if (chamberLoaded) {
+      renderCategoryBar();
+      renderProductSections();
+      updateCartUI();
+      return;
+    }
     try {
-      const [categories, products, settings] = await Promise.all([
-        sanityFetch(`*[_type == "category"] | order(priority asc){ _id, title, slug, accentColor }`),
-        sanityFetch(`*[_type == "hiddenProduct"]{ _id, title, description, price, "categoryId": category->_id, "categoryColor": category->accentColor, "imageUrl": image.asset->url }`),
-        sanityFetch(`*[_type == "siteSettings"][0]{ orderChatUrl }`)
+      var results = await Promise.all([
+        sanityFetch('*[_type == "category"] | order(priority asc){ _id, title, slug, accentColor }'),
+        sanityFetch('*[_type == "hiddenProduct"]{ _id, title, description, price, "categoryId": category->_id, "categoryColor": category->accentColor, "imageUrl": image.asset->url }'),
+        sanityFetch('*[_type == "siteSettings"][0]{ orderChatUrl }')
       ]);
+      allCategories = results[0] || [];
+      allProducts   = results[1] || [];
+      if (results[2] && results[2].orderChatUrl) orderChatUrl = results[2].orderChatUrl;
 
-      allCategories = categories || [];
-      allProducts   = products   || [];
-      if (settings && settings.orderChatUrl) orderChatUrl = settings.orderChatUrl;
-
-      document.getElementById('chamber-skeleton').classList.add('hidden');
-      document.getElementById('product-sections').classList.remove('hidden');
+      document.getElementById('chamber-skeleton').style.display   = 'none';
+      document.getElementById('product-sections').style.display   = 'block';
 
       chamberLoaded = true;
       renderCategoryBar();
       renderProductSections();
+      updateCartUI();
     } catch(e) {
       console.error('Chamber load:', e);
-      document.getElementById('chamber-skeleton').innerHTML =
-        `<p class="text-center text-slate-500 font-mono text-xs py-12">Failed to load products. Refresh to retry.</p>`;
+      document.getElementById('chamber-skeleton').innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-12">Failed to load products. Refresh to retry.</p>';
     }
   }
 
   /* ═══════════════════════════════════════════════════════════
-     RENDER CATEGORY PILL BAR
+     RENDER CATEGORY BAR
   ═══════════════════════════════════════════════════════════ */
   function renderCategoryBar() {
-    const bar = document.getElementById('category-bar');
-
-    const allPill = buildPill('all', 'All', null);
-    const catPills = allCategories.map(c => buildPill(c._id, c.title, c.accentColor)).join('');
-    bar.innerHTML = allPill + catPills;
-
-    bar.querySelectorAll('.cat-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
+    var bar = document.getElementById('category-bar');
+    var html = buildPill('all', 'All', null);
+    allCategories.forEach(function(c) { html += buildPill(c._id, c.title, c.accentColor); });
+    bar.innerHTML = html;
+    bar.querySelectorAll('.cat-pill').forEach(function(btn) {
+      btn.addEventListener('click', function() {
         activeCategory = btn.dataset.catid;
         renderCategoryBar();
         renderProductSections();
         if (activeCategory !== 'all') {
-          const section = document.getElementById('section-' + activeCategory);
-          if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          document.getElementById('chamber-main').scrollTo({ top: 0, behavior: 'smooth' });
+          var sec = document.getElementById('section-' + activeCategory);
+          if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
     });
   }
 
   function buildPill(id, label, color) {
-    const t = color ? theme(color) : null;
-    const isActive = activeCategory === id;
-
-    let style = '', baseClass = 'cat-pill shrink-0 min-h-[36px] px-4 py-1 rounded-full text-xs font-mono font-semibold border transition-all cursor-pointer whitespace-nowrap flex items-center';
-
+    var t = color ? theme(color) : null;
+    var isActive = activeCategory === id;
+    var style = '';
     if (isActive && t) {
-      style = `background:${t.pillBg};color:${t.text};border-color:${t.border};box-shadow:0 0 10px ${t.glow};`;
-    } else if (isActive && !t) {
-      style = `background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.2);`;
+      style = 'background:' + t.pillBg + ';color:' + t.text + ';border-color:' + t.border + ';box-shadow:0 0 10px ' + t.glow + ';';
+    } else if (isActive) {
+      style = 'background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.2);';
     } else {
-      style = `background:rgba(255,255,255,0.04);color:#64748b;border-color:rgba(255,255,255,0.08);`;
+      style = 'background:rgba(255,255,255,0.04);color:#64748b;border-color:rgba(255,255,255,0.08);';
     }
-
-    return `<button class="${baseClass}" style="${style}" data-catid="${id}">${label}</button>`;
+    return '<button class="cat-pill shrink-0 min-h-[36px] px-4 py-1 rounded-full text-xs font-mono font-semibold border transition-all cursor-pointer whitespace-nowrap flex items-center" style="' + style + '" data-catid="' + id + '">' + label + '</button>';
   }
 
   /* ═══════════════════════════════════════════════════════════
      RENDER PRODUCT SECTIONS
   ═══════════════════════════════════════════════════════════ */
   function renderProductSections() {
-    const container = document.getElementById('product-sections');
-    const categoriesToShow = activeCategory === 'all'
-      ? allCategories
-      : allCategories.filter(c => c._id === activeCategory);
+    var container = document.getElementById('product-sections');
+    var cats = activeCategory === 'all' ? allCategories : allCategories.filter(function(c) { return c._id === activeCategory; });
 
-    if (categoriesToShow.length === 0 && activeCategory !== 'all') {
-      container.innerHTML = `<p class="text-center text-slate-500 font-mono text-xs py-16">No products in this category.</p>`;
+    if (cats.length === 0) {
+      container.innerHTML = '<p class="text-center text-slate-500 font-mono text-xs py-16">No products in this category.</p>';
       return;
     }
 
-    container.innerHTML = categoriesToShow.map(cat => {
-      const products = allProducts.filter(p => p.categoryId === cat._id);
-      const t = theme(cat.accentColor);
-      const cardsHtml = products.length === 0
-        ? `<p class="text-center text-slate-600 font-mono text-xs py-8">No products yet. Add via Studio.</p>`
-        : products.map(p => buildProductCard(p, t)).join('');
+    container.innerHTML = cats.map(function(cat, idx) {
+      var products = allProducts.filter(function(p) { return p.categoryId === cat._id; });
+      var t = theme(cat.accentColor);
+      var num = String(idx + 1).padStart(2, '0');
+      var cardsHtml = products.length === 0
+        ? '<p class="text-center text-slate-600 font-mono text-xs py-8">No products yet. Add via Studio.</p>'
+        : products.map(function(p) { return buildProductCard(p, t); }).join('');
 
-      return `
-        <section id="section-${cat._id}" class="space-y-4">
-          <div class="flex items-center space-x-3 pb-3 border-b" style="border-color:${t.border}20;">
-            <div class="w-7 h-7 rounded-lg flex items-center justify-center font-mono font-bold text-xs" style="background:${t.pillBg};color:${t.text};border:1px solid ${t.border};">${allCategories.indexOf(cat) + 1 < 10 ? '0' + (allCategories.indexOf(cat)+1) : allCategories.indexOf(cat)+1}</div>
-            <h3 class="font-street text-lg sm:text-xl font-black tracking-wider uppercase" style="color:${t.sectionHead};">${cat.title}</h3>
-          </div>
-          <div class="space-y-3">${cardsHtml}</div>
-        </section>`;
+      return '<section id="section-' + cat._id + '" class="space-y-4">' +
+        '<div class="flex items-center space-x-3 pb-3 border-b" style="border-color:' + t.border + '20;">' +
+        '<div class="w-7 h-7 rounded-lg flex items-center justify-center font-mono font-bold text-xs" style="background:' + t.pillBg + ';color:' + t.text + ';border:1px solid ' + t.border + ';">' + num + '</div>' +
+        '<h3 class="font-street text-lg sm:text-xl font-black tracking-wider uppercase" style="color:' + t.sectionHead + ';">' + cat.title + '</h3>' +
+        '</div><div class="space-y-3">' + cardsHtml + '</div></section>';
     }).join('');
 
-    // Re-bind quantity buttons after re-render
     bindQtyButtons();
   }
 
   /* ═══════════════════════════════════════════════════════════
-     PRODUCT CARD BUILDER (Mobile-first horizontal)
+     PRODUCT CARD BUILDER
   ═══════════════════════════════════════════════════════════ */
   function buildProductCard(p, t) {
-    const qty = cart[p._id]?.qty || 0;
-    const imgTag = p.imageUrl
-      ? `<img src="${p.imageUrl}" alt="${p.title}" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shrink-0" style="border:1px solid ${t.border}30;"/>`
-      : `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-3xl shrink-0" style="background:${t.pillBg};border:1px solid ${t.border}30;">⚡</div>`;
+    var qty = cart[p._id] ? cart[p._id].qty : 0;
+    var imgTag = p.imageUrl
+      ? '<img src="' + p.imageUrl + '" alt="' + p.title + '" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl shrink-0" style="border:1px solid ' + t.border + '30;"/>'
+      : '<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-3xl shrink-0" style="background:' + t.pillBg + ';border:1px solid ' + t.border + '30;">⚡</div>';
 
-    const qtyControl = qty === 0
-      ? `<button class="qty-add min-h-[36px] min-w-[80px] px-4 py-1.5 rounded-xl text-xs font-mono font-bold active:scale-95 transition-all" style="background:${t.btnBg};color:${t.btnText};" data-pid="${p._id}" data-title="${escAttr(p.title)}" data-price="${escAttr(p.price)}">+ Add</button>`
-      : `<div class="flex items-center space-x-1">
-           <button class="qty-dec w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:${t.pillBg};color:${t.text};border:1px solid ${t.border};" data-pid="${p._id}" data-action="dec">−</button>
-           <span class="w-7 text-center text-sm font-mono font-bold text-white">${qty}</span>
-           <button class="qty-inc w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:${t.btnBg};color:${t.btnText};" data-pid="${p._id}" data-title="${escAttr(p.title)}" data-price="${escAttr(p.price)}" data-action="inc">+</button>
-         </div>`;
+    var qtyControl = buildQtyControl(p, t, qty);
 
-    return `
-      <div id="card-${p._id}" class="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-2xl transition-all" style="background:rgba(15,20,32,0.85);border:1px solid ${t.border}30;backdrop-filter:blur(12px);">
-        ${imgTag}
-        <div class="flex-grow min-w-0 space-y-1">
-          <h4 class="font-street font-bold text-white text-sm sm:text-base leading-tight truncate">${p.title}</h4>
-          <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">${p.description || ''}</p>
-          <div class="flex items-center justify-between pt-1 gap-2">
-            <span class="font-mono font-bold text-sm" style="color:${t.text};">${p.price}</span>
-            <div class="qty-control" data-pid="${p._id}">${qtyControl}</div>
-          </div>
-        </div>
-      </div>`;
+    return '<div id="card-' + p._id + '" class="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 rounded-2xl transition-all" style="background:rgba(15,20,32,0.85);border:1px solid ' + t.border + '30;backdrop-filter:blur(12px);">' +
+      imgTag +
+      '<div class="flex-grow min-w-0 space-y-1">' +
+      '<h4 class="font-street font-bold text-white text-sm sm:text-base leading-tight truncate">' + p.title + '</h4>' +
+      '<p class="text-xs text-slate-500 leading-relaxed line-clamp-2">' + (p.description || '') + '</p>' +
+      '<div class="flex items-center justify-between pt-1 gap-2">' +
+      '<span class="font-mono font-bold text-sm" style="color:' + t.text + ';">' + p.price + '</span>' +
+      '<div class="qty-control" data-pid="' + p._id + '">' + qtyControl + '</div>' +
+      '</div></div></div>';
+  }
+
+  function buildQtyControl(p, t, qty) {
+    if (qty === 0) {
+      return '<button class="qty-add min-h-[36px] min-w-[72px] px-3 py-1.5 rounded-xl text-xs font-mono font-bold active:scale-95 transition-all" style="background:' + t.btnBg + ';color:' + t.btnText + ';" data-pid="' + p._id + '" data-title="' + escAttr(p.title) + '" data-price="' + escAttr(p.price) + '">+ Add</button>';
+    }
+    return '<div class="flex items-center space-x-1">' +
+      '<button class="qty-dec w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:' + t.pillBg + ';color:' + t.text + ';border:1px solid ' + t.border + ';" data-pid="' + p._id + '">−</button>' +
+      '<span class="w-7 text-center text-sm font-mono font-bold text-white">' + qty + '</span>' +
+      '<button class="qty-inc w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:' + t.btnBg + ';color:' + t.btnText + ';" data-pid="' + p._id + '" data-title="' + escAttr(p.title) + '" data-price="' + escAttr(p.price) + '">+</button>' +
+      '</div>';
   }
 
   /* ═══════════════════════════════════════════════════════════
      QTY BUTTON BINDING
   ═══════════════════════════════════════════════════════════ */
   function bindQtyButtons() {
-    // + Add button (qty = 0 → 1)
-    document.querySelectorAll('.qty-add').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const pid   = btn.dataset.pid;
-        const title = btn.dataset.title;
-        const price = btn.dataset.price;
-        cart[pid] = { title, price, qty: 1 };
+    document.querySelectorAll('.qty-add').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var pid = btn.dataset.pid;
+        cart[pid] = { title: btn.dataset.title, price: btn.dataset.price, qty: 1 };
+        saveCart();
         updateCartUI();
         refreshCard(pid);
       });
     });
-
-    // Increment
-    document.querySelectorAll('.qty-inc').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const pid   = btn.dataset.pid;
-        const title = btn.dataset.title;
-        const price = btn.dataset.price;
-        if (!cart[pid]) cart[pid] = { title, price, qty: 0 };
+    document.querySelectorAll('.qty-inc').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var pid = btn.dataset.pid;
+        if (!cart[pid]) cart[pid] = { title: btn.dataset.title, price: btn.dataset.price, qty: 0 };
         cart[pid].qty++;
+        saveCart();
         updateCartUI();
         refreshCard(pid);
       });
     });
-
-    // Decrement
-    document.querySelectorAll('.qty-dec').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const pid = btn.dataset.pid;
+    document.querySelectorAll('.qty-dec').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var pid = btn.dataset.pid;
         if (!cart[pid]) return;
         cart[pid].qty--;
         if (cart[pid].qty <= 0) delete cart[pid];
+        saveCart();
         updateCartUI();
         refreshCard(pid);
       });
     });
   }
 
-  /* Refresh individual product card qty control only */
   function refreshCard(pid) {
-    const product = allProducts.find(p => p._id === pid);
+    var product = allProducts.find(function(p) { return p._id === pid; });
     if (!product) return;
-    const t = theme(product.categoryColor);
-    const qty = cart[pid]?.qty || 0;
-
-    const qtyControl = qty === 0
-      ? `<button class="qty-add min-h-[36px] min-w-[80px] px-4 py-1.5 rounded-xl text-xs font-mono font-bold active:scale-95 transition-all" style="background:${t.btnBg};color:${t.btnText};" data-pid="${pid}" data-title="${escAttr(product.title)}" data-price="${escAttr(product.price)}">+ Add</button>`
-      : `<div class="flex items-center space-x-1">
-           <button class="qty-dec w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:${t.pillBg};color:${t.text};border:1px solid ${t.border};" data-pid="${pid}" data-action="dec">−</button>
-           <span class="w-7 text-center text-sm font-mono font-bold text-white">${qty}</span>
-           <button class="qty-inc w-9 h-9 rounded-xl flex items-center justify-center text-sm font-mono font-bold active:scale-95 transition-all" style="background:${t.btnBg};color:${t.btnText};" data-pid="${pid}" data-title="${escAttr(product.title)}" data-price="${escAttr(product.price)}" data-action="inc">+</button>
-         </div>`;
-
-    const qtyContainer = document.querySelector(`#card-${pid} .qty-control`);
-    if (qtyContainer) {
-      qtyContainer.innerHTML = qtyControl;
+    var t = theme(product.categoryColor);
+    var qty = cart[pid] ? cart[pid].qty : 0;
+    var el = document.querySelector('#card-' + pid + ' .qty-control');
+    if (el) {
+      el.innerHTML = buildQtyControl(product, t, qty);
       bindQtyButtons();
     }
   }
 
   /* ═══════════════════════════════════════════════════════════
-     CART UI UPDATE
+     CART UI + FLOATING BAR
   ═══════════════════════════════════════════════════════════ */
   function updateCartUI() {
-    const entries = Object.values(cart);
-    const totalQty = entries.reduce((s, e) => s + e.qty, 0);
-    const totalPrice = entries.reduce((s, e) => {
-      const num = parseFloat((e.price || '0').replace(/[^0-9.]/g,'')) || 0;
-      return s + num * e.qty;
+    var entries = Object.values(cart);
+    var totalQty = entries.reduce(function(s, e) { return s + e.qty; }, 0);
+    var totalPrice = entries.reduce(function(s, e) {
+      var n = parseFloat((e.price || '0').replace(/[^0-9.]/g, '')) || 0;
+      return s + n * e.qty;
     }, 0);
 
-    // Badge
     document.getElementById('cart-badge').textContent = totalQty;
     document.getElementById('cart-summary-text').textContent =
-      `${totalQty} item${totalQty !== 1 ? 's' : ''} • $${totalPrice.toFixed(2)}`;
+      totalQty + ' item' + (totalQty !== 1 ? 's' : '') + ' \u2022 $' + totalPrice.toFixed(2);
 
-    // Show/hide floating bar
-    const bar = document.getElementById('checkout-bar');
+    var bar = document.getElementById('checkout-bar');
     if (totalQty > 0) {
       bar.classList.remove('hidden-bar');
     } else {
@@ -641,199 +736,175 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     ONE-CLICK CHAT ORDER DISPATCH
+     CHAT ORDER DISPATCH
   ═══════════════════════════════════════════════════════════ */
   function proceedToChat() {
-    const entries = Object.values(cart);
+    var entries = Object.values(cart);
     if (entries.length === 0) return;
-
-    const totalPrice = entries.reduce((s, e) => {
-      const num = parseFloat((e.price || '0').replace(/[^0-9.]/g,'')) || 0;
-      return s + num * e.qty;
+    var totalPrice = entries.reduce(function(s, e) {
+      var n = parseFloat((e.price || '0').replace(/[^0-9.]/g, '')) || 0;
+      return s + n * e.qty;
     }, 0);
-
-    const lines = entries.map(e => `• ${e.qty}x ${e.title} (${e.price} each)`).join('\n');
-    const message =
-`New Order from Midnight Xotixs:
---------------------------------
-${lines}
---------------------------------
-Total: $${totalPrice.toFixed(2)}
-Delivery Address: [Please write your address here]`;
-
-    const chatUrl = orderChatUrl || '';
-    if (!chatUrl) {
-      showToast('⚠️ Order chat not configured yet.', 'amber');
-      return;
-    }
-
-    let finalUrl = chatUrl;
+    var lines = entries.map(function(e) { return '\u2022 ' + e.qty + 'x ' + e.title + ' (' + e.price + ' each)'; }).join('\n');
+    var message = 'New Order from Midnight Xotixs:\n--------------------------------\n' + lines + '\n--------------------------------\nTotal: $' + totalPrice.toFixed(2) + '\nDelivery Address: [Please write your address here]';
+    var chatUrl = orderChatUrl || '';
+    if (!chatUrl) { showToast('\u26A0\uFE0F Order chat not configured yet.', 'amber'); return; }
+    var finalUrl = chatUrl;
     if (chatUrl.includes('wa.me') || chatUrl.includes('whatsapp')) {
-      const base = chatUrl.split('?')[0];
-      finalUrl = `${base}?text=${encodeURIComponent(message)}`;
+      finalUrl = chatUrl.split('?')[0] + '?text=' + encodeURIComponent(message);
     } else if (chatUrl.includes('t.me') || chatUrl.includes('telegram')) {
-      finalUrl = `${chatUrl}?start=${encodeURIComponent(message.substring(0, 64))}`;
+      finalUrl = chatUrl + '?start=' + encodeURIComponent(message.substring(0, 64));
     }
-
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
   }
 
   /* ═══════════════════════════════════════════════════════════
      TOAST
   ═══════════════════════════════════════════════════════════ */
-  function showToast(msg, color = 'blue') {
-    const t = theme(color);
-    const container = document.getElementById('toast-container');
-    const el = document.createElement('div');
+  function showToast(msg, color) {
+    var t = theme(color || 'blue');
+    var container = document.getElementById('toast-container');
+    var el = document.createElement('div');
     el.className = 'pointer-events-auto transition-all duration-300 translate-y-4 opacity-0 rounded-xl px-4 py-3 text-xs font-mono max-w-xs';
-    el.style.cssText = `background:rgba(15,20,32,.97);border:1px solid ${t.border};color:${t.text};box-shadow:0 0 16px ${t.glow};`;
+    el.style.cssText = 'background:rgba(15,20,32,.97);border:1px solid ' + t.border + ';color:' + t.text + ';box-shadow:0 0 16px ' + t.glow + ';';
     el.textContent = msg;
     container.appendChild(el);
-    requestAnimationFrame(() => el.classList.remove('translate-y-4','opacity-0'));
-    setTimeout(() => { el.classList.add('translate-y-4','opacity-0'); setTimeout(() => el.remove(), 300); }, 3000);
+    requestAnimationFrame(function() { el.classList.remove('translate-y-4', 'opacity-0'); });
+    setTimeout(function() {
+      el.classList.add('translate-y-4', 'opacity-0');
+      setTimeout(function() { el.remove(); }, 300);
+    }, 3000);
   }
 
   /* ═══════════════════════════════════════════════════════════
      ATTR ESCAPER
   ═══════════════════════════════════════════════════════════ */
   function escAttr(str) {
-    return (str || '').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    return (str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   /* ═══════════════════════════════════════════════════════════
-     SANITY WRITE — Mark passcode used
+     SANITY WRITE — mark passcode used
   ═══════════════════════════════════════════════════════════ */
   async function markPasscodeUsed(docId) {
-    const res = await fetch(
-      `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/mutate/${SANITY_DATASET}`,
+    var res = await fetch(
+      'https://' + SANITY_PROJECT_ID + '.api.sanity.io/v' + SANITY_API_VERSION + '/data/mutate/' + SANITY_DATASET,
       {
         method: 'POST',
-        headers: { 'Content-Type':'application/json', Authorization:`Bearer ${SANITY_WRITE_TOKEN}` },
-        body: JSON.stringify({ mutations:[{ patch:{ id:docId, set:{ isUsed:true } } }] })
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + SANITY_WRITE_TOKEN },
+        body: JSON.stringify({ mutations: [{ patch: { id: docId, set: { isUsed: true } } }] })
       }
     );
-    if (!res.ok) throw new Error(`Mutate: ${res.statusText}`);
+    if (!res.ok) throw new Error('Mutate: ' + res.statusText);
   }
 
   /* ═══════════════════════════════════════════════════════════
-     MODAL + GATEWAY LOGIC
+     BOOT
   ═══════════════════════════════════════════════════════════ */
-  document.addEventListener('DOMContentLoaded', () => {
-    const bakeryUi      = document.getElementById('bakery-ui');
-    const chamber       = document.getElementById('hidden-chamber');
-    const authModal     = document.getElementById('auth-modal');
-    const openAuthBtn   = document.getElementById('open-auth-btn');
-    const heroMemberBtn = document.getElementById('hero-member-btn');
-    const footerLink    = document.getElementById('footer-portal-link');
-    const closeModalBtn = document.getElementById('close-modal-btn');
-    const loginView     = document.getElementById('login-view');
-    const registerView  = document.getElementById('register-view');
-    const goToReg       = document.getElementById('go-to-register-btn');
-    const goToLogin     = document.getElementById('go-to-login-btn');
-    const loginForm     = document.getElementById('login-form');
-    const loginError    = document.getElementById('login-error');
-    const regForm       = document.getElementById('register-form');
-    const regError      = document.getElementById('register-error');
-    const regErrText    = document.getElementById('register-error-text');
-    const regSubmitBtn  = document.getElementById('register-submit-btn');
-    const regSpinner    = document.getElementById('register-btn-spinner');
-    const regBtnText    = document.getElementById('register-btn-text');
-    const regPasscode   = document.getElementById('reg-passcode');
-    const relockBtn     = document.getElementById('relock-btn');
-    const checkoutBar   = document.getElementById('checkout-bar');
-    const proceedBtn    = document.getElementById('proceed-to-chat-btn');
+  document.addEventListener('DOMContentLoaded', function() {
 
-    // ── Helpers ──
-    const openModal = (view='login') => {
-      authModal.classList.remove('hidden');
-      resetForms();
-      view === 'register' ? showReg() : showLogin();
-    };
-    const closeModal = () => { authModal.classList.add('hidden'); resetForms(); };
-    const showLogin = () => { loginView.classList.remove('hidden'); registerView.classList.add('hidden'); loginError.classList.add('hidden'); };
-    const showReg   = () => { registerView.classList.remove('hidden'); loginView.classList.add('hidden'); regError.classList.add('hidden'); };
-    const resetForms = () => {
-      loginForm.reset(); regForm.reset();
-      loginError.classList.add('hidden'); regError.classList.add('hidden');
-      setLoading(false);
-    };
-    const setLoading = (on) => {
-      regSubmitBtn.disabled = on;
-      regSpinner.classList.toggle('hidden', !on);
-      regBtnText.textContent = on ? 'Verifying...' : 'Complete Registration';
-    };
+    /* ── Restore cart from localStorage ── */
+    cart = loadCart();
 
-    // ── Bind triggers ──
-    openAuthBtn.addEventListener('click',   () => openModal('login'));
-    if (heroMemberBtn) heroMemberBtn.addEventListener('click', () => openModal('login'));
-    if (footerLink)    footerLink.addEventListener('click', e => { e.preventDefault(); openModal('login'); });
-    closeModalBtn.addEventListener('click', closeModal);
-    authModal.addEventListener('click', e => { if (e.target === authModal) closeModal(); });
-    goToReg.addEventListener('click', showReg);
-    goToLogin.addEventListener('click', showLogin);
+    /* ── If already authenticated (set by anti-flicker script), load chamber directly ── */
+    if (window.__xotixs_authed) {
+      showChamber();
+      loadBakery();  // loads orderChatUrl etc. in background
+      loadChamber();
+      return;        // skip binding auth modal events below? No — still bind them for safety
+    }
 
-    // ── Decoy login — always rejects ──
-    loginForm.addEventListener('submit', e => {
+    /* ── No valid session — show bakery ── */
+    showBakery();
+    loadBakery();
+
+    /* ── DOM refs ── */
+    var openAuthBtn    = document.getElementById('open-auth-btn');
+    var heroMemberBtn  = document.getElementById('hero-member-btn');
+    var footerLink     = document.getElementById('footer-portal-link');
+    var closeModalBtn  = document.getElementById('close-modal-btn');
+    var goToReg        = document.getElementById('go-to-register-btn');
+    var goToLogin      = document.getElementById('go-to-login-btn');
+    var loginForm      = document.getElementById('login-form');
+    var regForm        = document.getElementById('register-form');
+    var regPasscode    = document.getElementById('reg-passcode');
+    var regErrText     = document.getElementById('register-error-text');
+    var relockBtn      = document.getElementById('relock-btn');
+    var proceedBtn     = document.getElementById('proceed-to-chat-btn');
+    var authModal      = document.getElementById('auth-modal');
+
+    /* ── Modal triggers ── */
+    openAuthBtn.addEventListener('click',   function() { showModal('login'); });
+    if (heroMemberBtn) heroMemberBtn.addEventListener('click', function() { showModal('login'); });
+    if (footerLink)    footerLink.addEventListener('click', function(e) { e.preventDefault(); showModal('login'); });
+    closeModalBtn.addEventListener('click', hideModal);
+    authModal.addEventListener('click', function(e) { if (e.target === authModal) hideModal(); });
+    goToReg.addEventListener('click', showRegView);
+    goToLogin.addEventListener('click', showLoginView);
+
+    /* ── Decoy login (always rejects) ── */
+    loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      loginError.classList.remove('hidden');
+      document.getElementById('login-error').style.display = 'flex';
     });
 
-    // ── Gateway registration ──
-    regForm.addEventListener('submit', async e => {
+    /* ── Gateway registration ── */
+    regForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      regError.classList.add('hidden');
-      const code = regPasscode.value.trim();
+      document.getElementById('register-error').style.display = 'none';
+      var code = regPasscode.value.trim();
       if (!code) return;
       setLoading(true);
 
       try {
-        const doc = await sanityFetch(`*[_type == "passcode" && code == "${code.replace(/"/g,'\\"')}"][0]`);
+        var doc = await sanityFetch('*[_type == "passcode" && code == "' + code.replace(/"/g, '\\"') + '"][0]');
 
         if (!doc) {
           regErrText.textContent = 'Invalid or expired invitation pass.';
-          regError.classList.remove('hidden');
+          document.getElementById('register-error').style.display = 'flex';
           return;
         }
         if (doc.isUsed === true) {
           regErrText.textContent = 'This pass has already been used.';
-          regError.classList.remove('hidden');
+          document.getElementById('register-error').style.display = 'flex';
           return;
         }
 
         await markPasscodeUsed(doc._id);
 
-        closeModal();
-        bakeryUi.classList.add('hidden');
-        chamber.classList.remove('hidden');
-        window.scrollTo({ top:0, behavior:'smooth' });
+        /* ── Save persistent session ── */
+        saveSession();
+
+        hideModal();
+        showChamber();
         await loadChamber();
 
       } catch(err) {
         console.error(err);
         regErrText.textContent = err.message || 'Verification failed. Try again.';
-        regError.classList.remove('hidden');
+        document.getElementById('register-error').style.display = 'flex';
       } finally {
         setLoading(false);
       }
     });
 
-    // ── Relock → back to bakery ──
-    if (relockBtn) {
-      relockBtn.addEventListener('click', () => {
-        chamber.classList.add('hidden');
-        bakeryUi.classList.remove('hidden');
-        cart = {};
-        updateCartUI();
-        resetForms();
-        window.scrollTo({ top:0, behavior:'smooth' });
-      });
-    }
+    /* ── Exit & Lock ── */
+    relockBtn.addEventListener('click', function() {
+      clearSession();
+      cart = {};
+      updateCartUI();
+      chamberLoaded = false;
+      resetForms();
+      showBakery();
+      /* reset skeleton for next load */
+      document.getElementById('chamber-skeleton').style.display = 'block';
+      document.getElementById('product-sections').style.display = 'none';
+    });
 
-    // ── Checkout bar proceed ──
+    /* ── Checkout ── */
     if (proceedBtn) proceedBtn.addEventListener('click', proceedToChat);
 
-    // ── Boot bakery ──
-    loadBakery();
+    /* ── If session was valid, bindings above still needed for relock etc. ── */
   });
 </script>
 </body>
