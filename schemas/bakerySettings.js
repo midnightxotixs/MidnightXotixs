@@ -25,6 +25,13 @@ export default defineType({
       options: {hotspot: true},
     }),
     defineField({
+      name: 'favicon',
+      title: 'Website Favicon',
+      type: 'image',
+      description: 'Upload browser tab favicon (PNG, ICO, or SVG)',
+      options: { hotspot: true }
+    }),
+    defineField({
       name: 'footerBio',
       title: 'Footer Bakery Bio / Description',
       type: 'text',

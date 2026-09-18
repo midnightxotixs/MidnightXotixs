@@ -2600,7 +2600,7 @@
   async function loadBakery() {
     try {
       var results = await Promise.all([
-        sanityFetch('*[_type == "bakerySettings"][0]{ siteName, logo, "logoUrl": logo.asset->url, heroSlider[]{ title, subtitle, "imageUrl": image.asset->url, buttonText }, footerBio, phone, directChatUrl, directChatLabel, email, openingHours, siteSubtitle, hotlinePhone, headOfficeAddress, contactEmail, businessHours, flashSaleTitle }').catch(function(){ return null; }),
+        sanityFetch('*[_type == "bakerySettings"][0]{ siteName, logo, "logoUrl": logo.asset->url, favicon, "faviconUrl": favicon.asset->url, heroSlider[]{ title, subtitle, "imageUrl": image.asset->url, buttonText }, footerBio, phone, directChatUrl, directChatLabel, email, openingHours, siteSubtitle, hotlinePhone, headOfficeAddress, contactEmail, businessHours, flashSaleTitle }').catch(function(){ return null; }),
         sanityFetch('*[_type == "bakeryCategory"] | order(priority asc){ _id, title, "slug": slug.current, priority }').catch(function(){ return []; }),
         sanityFetch('*[_type == "bakeryProduct"]{ _id, title, description, price, salePrice, subCategoryText, isFlashSale, isNew, "categoryId": category->_id, "categoryTitle": category->title, "imageUrl": image.asset->url }').catch(function(){ return []; })
       ]);
@@ -2635,6 +2635,13 @@
           if (footerName) footerName.textContent = settings.siteName;
           var copyName = document.getElementById('footer-site-name-copy');
           if (copyName) copyName.textContent = settings.siteName;
+        }
+        if (settings.faviconUrl) {
+          const faviconEl = document.querySelector("link[rel*='icon']") || document.createElement('link');
+          faviconEl.type = 'image/x-icon';
+          faviconEl.rel = 'shortcut icon';
+          faviconEl.href = settings.faviconUrl;
+          document.head.appendChild(faviconEl);
         }
         if (settings.logoUrl) {
           var footerLogo = document.getElementById('footer-logo-wrap');
