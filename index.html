@@ -138,6 +138,23 @@
     .vip-card-glow { animation: vipGlow 3.5s ease-in-out infinite; }
 
     .pb-safe { padding-bottom: env(safe-area-inset-bottom, 12px); }
+
+    /* Ensure all images are contained within their boxes */
+    img { max-width: 100%; height: auto; }
+    
+    /* Line clamp utility */
+    .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+    .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+
+    /* Mobile bottom nav safe area */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      #mobile-bottom-nav {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+      }
+    }
+
+    /* Prevent text overflow in narrow 2-col product cards */
+    .product-card-title { word-break: break-word; hyphens: auto; }
   </style>
 
   <!-- ═══════════════════════════════════════════════════════════
@@ -233,7 +250,7 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <!--  1. BAKERY STOREFRONT (100% Clean English Artisanal UI)    -->
 <!-- ══════════════════════════════════════════════════════════ -->
-<div id="bakery-ui" class="w-full flex-col min-h-screen bg-[#FAF7F2] pb-20 md:pb-0">
+<div id="bakery-ui" class="w-full flex-col min-h-screen bg-[#FAF7F2] pb-24 md:pb-0">
 
   <!-- MAIN HEADER: Navigation -->
   <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-stone-200/80 transition-all duration-300">
@@ -300,8 +317,8 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- 3. DYNAMIC HERO IMAGE SLIDER (3s transitions & controls)  -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <section id="hero-section" class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 w-full">
-    <div class="relative w-full h-[400px] sm:h-[480px] lg:h-[540px] rounded-3xl overflow-hidden shadow-xl border border-stone-200/90 bg-stone-900">
+  <section id="hero-section" class="relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-8 sm:pb-12 w-full">
+    <div class="relative w-full h-[260px] xs:h-[320px] sm:h-[420px] md:h-[480px] lg:h-[540px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-stone-200/90 bg-stone-900">
       
       <!-- Slider Track -->
       <div id="hero-carousel-track" class="relative w-full h-full">
@@ -326,33 +343,33 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- 4. FLASH SALE PRODUCTS SECTION                           -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <section id="flash-sale-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-    <div class="bg-gradient-to-br from-amber-50/80 via-white to-orange-50/60 rounded-3xl p-6 sm:p-8 lg:p-10 border border-amber-200/70 shadow-sm relative overflow-hidden">
+  <section id="flash-sale-section" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 w-full">
+    <div class="bg-gradient-to-br from-amber-50/80 via-white to-orange-50/60 rounded-2xl sm:rounded-3xl p-4 sm:p-8 lg:p-10 border border-amber-200/70 shadow-sm relative overflow-hidden">
       
       <div class="absolute -right-16 -top-16 w-56 h-56 bg-amber-200/30 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Section Header -->
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
         <div>
-          <div class="inline-flex items-center space-x-2 bg-rose-100/80 text-rose-800 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-rose-200 mb-2.5 shadow-xs">
+          <div class="inline-flex items-center gap-1.5 bg-rose-100/80 text-rose-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-rose-200 mb-2 shadow-xs">
             <span>🔥</span>
-            <span>FLASH SALE &bull; LIMITED TIME BATCHES</span>
+            <span>FLASH SALE · LIMITED TIME</span>
           </div>
-          <h2 id="flash-sale-heading" class="heading-serif text-2xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight">
+          <h2 id="flash-sale-heading" class="heading-serif text-xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight">
             Flash Sale Products
           </h2>
           <p class="text-xs sm:text-sm text-stone-500 mt-1">
-            Special reserve recipes baked today at promotional prices for a limited time.
+            Special reserve recipes baked today at promotional prices.
           </p>
         </div>
 
-        <div class="flex items-center space-x-2 text-xs font-mono font-bold text-amber-900 bg-amber-100/60 px-3.5 py-1.5 rounded-xl border border-amber-200">
+        <div class="flex items-center gap-2 text-xs font-mono font-bold text-amber-900 bg-amber-100/60 px-3.5 py-1.5 rounded-xl border border-amber-200 self-start sm:self-auto">
           <span>⏰ Oven Closes: 9:00 PM</span>
         </div>
       </div>
 
-      <!-- Flash Sale Cards Grid / Horizontal Snap Scroll -->
-      <div id="flash-sale-grid" class="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 overflow-x-auto snap-x no-scrollbar pb-2">
+      <!-- Flash Sale Cards — 2 cols on mobile, 2 on sm, 4 on lg -->
+      <div id="flash-sale-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <!-- Populated dynamically -->
       </div>
 
@@ -362,28 +379,30 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- 5. ALL PRODUCTS CATALOGUE                                -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <section id="catalog-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+  <section id="catalog-section" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-10 sm:py-12 w-full">
     
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-10 pb-4 border-b border-stone-200">
-      <div>
-        <span class="text-xs font-bold uppercase tracking-widest text-amber-800 bg-amber-100/70 px-3 py-1 rounded-full border border-amber-200">Our Curated Collection</span>
-        <h2 class="heading-serif text-2xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight mt-2">
-          All Products
-        </h2>
-        <p class="text-xs sm:text-sm text-stone-500 mt-1">Slow-fermented artisan loaves, French brioches, gourmet cookies, and layered cakes.</p>
+    <div class="flex flex-col gap-4 mb-8 sm:mb-10 pb-4 border-b border-stone-200">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-amber-800 bg-amber-100/70 px-3 py-1 rounded-full border border-amber-200">Our Curated Collection</span>
+          <h2 class="heading-serif text-2xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight mt-2">
+            All Products
+          </h2>
+          <p class="text-xs sm:text-sm text-stone-500 mt-1">Slow-fermented artisan loaves, French brioches, gourmet cookies, and layered cakes.</p>
+        </div>
       </div>
 
       <!-- Category Filter Pills -->
-      <div id="catalog-category-pills" class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
-        <button class="cat-filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-[#1C1917] text-white shadow-xs cursor-pointer" data-cat="all">All</button>
-        <button class="cat-filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Pastries & Cakes">Pastries &amp; Cakes</button>
-        <button class="cat-filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Fresh Artisan Breads">Artisan Breads</button>
-        <button class="cat-filter-btn px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Cookies & Bites">Cookies &amp; Bites</button>
+      <div id="catalog-category-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 flex-nowrap">
+        <button class="cat-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-[#1C1917] text-white shadow-xs cursor-pointer" data-cat="all">All</button>
+        <button class="cat-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Pastries &amp; Cakes">Pastries &amp; Cakes</button>
+        <button class="cat-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Fresh Artisan Breads">Artisan Breads</button>
+        <button class="cat-filter-btn shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 shadow-xs cursor-pointer" data-cat="Cookies &amp; Bites">Cookies &amp; Bites</button>
       </div>
     </div>
 
-    <!-- Main Grid -->
-    <div id="bakery-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <!-- Main Grid: 2 cols on mobile, 3 on lg, 4 on xl -->
+    <div id="bakery-product-grid" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
       <!-- Injected via JavaScript -->
     </div>
 
@@ -392,22 +411,22 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- DEDICATED ROW: FRESH ARTISAN BREADS                      -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <section id="pan-dulce-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full border-t border-stone-200/80">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <div class="flex items-center space-x-2">
+  <section id="pan-dulce-section" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 w-full border-t border-stone-200/80">
+    <div class="flex items-start justify-between gap-3 mb-6 sm:mb-8">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xl">🥖</span>
-          <h3 class="heading-serif text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Fresh Artisan Breads</h3>
+          <h3 class="heading-serif text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 tracking-tight">Fresh Artisan Breads</h3>
         </div>
         <p class="text-xs sm:text-sm text-stone-500 mt-1">Slow-fermented sourdoughs, traditional golden conchas, and flaky French butter croissants.</p>
       </div>
-      <a href="#catalog-section" class="text-xs font-bold uppercase tracking-wider text-amber-900 hover:text-amber-700 hidden sm:inline-flex items-center space-x-1">
+      <a href="#catalog-section" class="text-xs font-bold uppercase tracking-wider text-amber-900 hover:text-amber-700 shrink-0 inline-flex items-center gap-1 mt-1">
         <span>View all</span>
         <span>&rarr;</span>
       </a>
     </div>
 
-    <div id="pan-dulce-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="pan-dulce-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       <!-- Injected via JS -->
     </div>
   </section>
@@ -415,22 +434,22 @@
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- DEDICATED ROW: PASTRIES & CAKES                          -->
   <!-- ══════════════════════════════════════════════════════════ -->
-  <section id="pasteles-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-20 w-full border-t border-stone-200/80">
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <div class="flex items-center space-x-2">
+  <section id="pasteles-section" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-10 pb-8 sm:pb-20 w-full border-t border-stone-200/80">
+    <div class="flex items-start justify-between gap-3 mb-6 sm:mb-8">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xl">🎂</span>
-          <h3 class="heading-serif text-2xl sm:text-3xl font-bold text-stone-900 tracking-tight">Pastries &amp; Cakes</h3>
+          <h3 class="heading-serif text-xl sm:text-2xl md:text-3xl font-bold text-stone-900 tracking-tight">Pastries &amp; Cakes</h3>
         </div>
         <p class="text-xs sm:text-sm text-stone-500 mt-1">Handcrafted Tres Leches, decadent Belgian chocolate truffle cakes, and Basque cheesecakes.</p>
       </div>
-      <a href="#catalog-section" class="text-xs font-bold uppercase tracking-wider text-amber-900 hover:text-amber-700 hidden sm:inline-flex items-center space-x-1">
+      <a href="#catalog-section" class="text-xs font-bold uppercase tracking-wider text-amber-900 hover:text-amber-700 shrink-0 inline-flex items-center gap-1 mt-1">
         <span>View all</span>
         <span>&rarr;</span>
       </a>
     </div>
 
-    <div id="pasteles-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="pasteles-grid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       <!-- Injected via JS -->
     </div>
   </section>
@@ -2077,46 +2096,47 @@
   ═══════════════════════════════════════════════════════════ */
   function buildProductCard(p, index) {
     var cardId = 'product-card-' + (p._id || index);
-    var isNewBadge = p.isNew ? '<span class="absolute top-3 left-3 z-10 bg-amber-100/90 text-amber-900 border border-amber-300/80 font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider shadow-xs backdrop-blur-xs">NEW</span>' : '';
+    var isNewBadge = p.isNew ? '<span class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-amber-100/90 text-amber-900 border border-amber-300/80 font-bold px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs backdrop-blur-xs">NEW</span>' : '';
     
     var isOffer = p.isFlashSale && (p.salePrice != null);
-    var offerBadge = isOffer ? '<span class="absolute top-3 left-3 z-10 bg-rose-600 text-white font-bold px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider shadow-xs">SALE</span>' : '';
+    var offerBadge = isOffer ? '<span class="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 bg-rose-600 text-white font-bold px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">SALE</span>' : '';
 
     var priceHtml = '';
     if (p.salePrice != null) {
-      priceHtml = '<div class="flex items-baseline space-x-1.5">' +
-        '<span class="font-mono font-black text-sm sm:text-base text-rose-600">$' + Number(p.salePrice).toFixed(2) + '</span>' +
-        '<span class="font-mono text-xs text-stone-400 line-through">$' + Number(p.price).toFixed(2) + '</span>' +
+      priceHtml = '<div class="flex items-baseline gap-1">' +
+        '<span class="font-mono font-black text-xs sm:text-sm md:text-base text-rose-600">$' + Number(p.salePrice).toFixed(2) + '</span>' +
+        '<span class="font-mono text-[10px] sm:text-xs text-stone-400 line-through">$' + Number(p.price).toFixed(2) + '</span>' +
       '</div>';
     } else {
-      priceHtml = '<span class="font-mono font-black text-sm sm:text-base text-stone-900">$' + Number(p.price).toFixed(2) + '</span>';
+      priceHtml = '<span class="font-mono font-black text-xs sm:text-sm md:text-base text-stone-900">$' + Number(p.price).toFixed(2) + '</span>';
     }
 
     var isHeartActive = wishlistItems.has(p.title);
     var heartFill = isHeartActive ? 'fill-rose-500 text-rose-500' : 'fill-none text-stone-400 hover:text-stone-700';
 
-    return '<div id="' + cardId + '" class="bg-white rounded-2xl border border-stone-200/80 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col justify-between group relative cursor-pointer">' +
+    return '<div id="' + cardId + '" class="bg-white rounded-xl sm:rounded-2xl border border-stone-200/80 shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col justify-between group relative cursor-pointer">' +
       '<div class="relative overflow-hidden aspect-[4/3] bg-stone-100">' +
         (offerBadge || isNewBadge) +
-        '<button class="wishlist-btn absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-stone-400 hover:text-rose-500 shadow-xs transition-all active:scale-90 cursor-pointer" data-title="' + escAttr(p.title) + '" aria-label="Save to Wishlist">' +
-          '<svg class="w-4 h-4 ' + heartFill + '" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>' +
+        '<button class="wishlist-btn absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-stone-400 hover:text-rose-500 shadow-xs transition-all active:scale-90 cursor-pointer" data-title="' + escAttr(p.title) + '" aria-label="Save to Wishlist">' +
+          '<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 ' + heartFill + '" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>' +
         '</button>' +
         (p.imageUrl
           ? '<img src="' + p.imageUrl + '" alt="' + escAttr(p.title) + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>'
-          : '<div class="w-full h-full flex items-center justify-center text-5xl">🥐</div>') +
+          : '<div class="w-full h-full flex items-center justify-center text-4xl sm:text-5xl">🥐</div>') +
       '</div>' +
 
-      '<div class="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">' +
-        '<div class="space-y-1">' +
-          '<span class="text-[10px] font-bold uppercase tracking-widest text-amber-800/80">' + (p.subCategoryText || p.categoryTitle || 'Artisanal Batch') + '</span>' +
-          '<h3 class="heading-serif font-bold text-base sm:text-lg text-stone-900 group-hover:text-amber-900 transition-colors line-clamp-1 leading-snug">' + p.title + '</h3>' +
-          '<p class="text-xs text-stone-500 line-clamp-2 leading-relaxed">' + (p.description || '') + '</p>' +
+      '<div class="p-3 sm:p-4 md:p-5 flex-1 flex flex-col justify-between gap-2">' +
+        '<div class="space-y-0.5 sm:space-y-1">' +
+          '<span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-amber-800/80 line-clamp-1">' + (p.subCategoryText || p.categoryTitle || 'Artisanal Batch') + '</span>' +
+          '<h3 class="heading-serif font-bold text-sm sm:text-base md:text-lg text-stone-900 group-hover:text-amber-900 transition-colors line-clamp-2 leading-snug">' + p.title + '</h3>' +
+          '<p class="text-[11px] sm:text-xs text-stone-500 line-clamp-2 leading-relaxed hidden sm:block">' + (p.description || '') + '</p>' +
         '</div>' +
 
-        '<div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">' +
+        '<div class="pt-2 sm:pt-3 border-t border-stone-100 flex items-center justify-between gap-1.5">' +
           priceHtml +
-          '<button class="direct-add-btn min-h-[36px] px-3.5 py-1.5 rounded-full bg-[#1C1917] hover:bg-stone-800 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-95 shadow-xs flex items-center space-x-1 cursor-pointer shrink-0" data-id="' + (p._id || index) + '">' +
-            '<span>+ Add to Cart</span>' +
+          '<button class="direct-add-btn min-h-[32px] sm:min-h-[36px] px-2 sm:px-3.5 py-1.5 rounded-full bg-[#1C1917] hover:bg-stone-800 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-95 shadow-xs flex items-center gap-1 cursor-pointer shrink-0" data-id="' + (p._id || index) + '">' +
+            '<span class="hidden sm:inline">+ Add to Cart</span>' +
+            '<span class="sm:hidden">+</span>' +
           '</button>' +
         '</div>' +
       '</div>' +
@@ -2174,7 +2194,7 @@
         flashItems = DEMO_PRODUCTS.filter(function(p) { return p.isFlashSale; });
       }
       fsGrid.innerHTML = flashItems.map(function(p, i) {
-        return '<div class="min-w-[260px] sm:min-w-0 snap-center">' + buildProductCard(p, 'fs-' + i) + '</div>';
+        return buildProductCard(p, 'fs-' + i);
       }).join('');
       bindCardEvents(fsGrid);
     }
