@@ -1,5 +1,4 @@
-import pkg from 'sanity/cli'
-const {defineCliConfig} = pkg
+import {defineCliConfig} from 'sanity/cli'
 
 export default defineCliConfig({
   api: {
@@ -8,9 +7,5 @@ export default defineCliConfig({
   },
   project: {
     basePath: '/studio'
-  },
-  vite: (config) => ({
-    ...config,
-    base: '/studio/'
-  })
+  }
 })

@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { "source": "/studio/(.*)", "destination": "/studio/index.html" },
+    { "source": "/studio/((?!.*\\.[\\w]+$).*)", "destination": "/studio/index.html" },
     { "source": "/studio", "destination": "/studio/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!.*\\.[\\w]+$).*)", "destination": "/index.html" }
   ]
 }
