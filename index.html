@@ -238,27 +238,6 @@
 <!-- ══════════════════════════════════════════════════════════ -->
 <div id="bakery-ui" class="w-full flex-col min-h-screen bg-[#FAF7F2]">
 
-  <!-- TOP BAR: Minimal Notification Strip -->
-  <aside aria-label="Store Announcement" class="w-full bg-[#1C1917] text-stone-300 text-xs py-2 px-4 sm:px-8 border-b border-stone-800">
-    <div class="max-w-7xl mx-auto flex flex-col xs:flex-row items-center justify-between gap-1 text-[11px] sm:text-xs">
-      <div class="flex items-center space-x-3 sm:space-x-5 font-mono">
-        <a href="tel:+18005550199" id="top-hotline-phone" class="flex items-center space-x-1.5 hover:text-amber-400 transition-colors">
-          <span class="text-amber-500">📞</span>
-          <span>+1 (800) 555-0199</span>
-        </a>
-        <span class="hidden sm:inline text-stone-600">|</span>
-        <span id="top-business-hours" class="hidden sm:flex items-center space-x-1 text-stone-400">
-          <span>🕒</span>
-          <span>Mon - Sun: 7:00 AM - 9:00 PM</span>
-        </span>
-      </div>
-      <div class="hidden sm:flex items-center space-x-2 text-stone-500 text-[11px] font-mono">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Open Today &bull; Fresh Batches Ready</span>
-      </div>
-    </div>
-  </aside>
-
   <!-- MAIN HEADER: Navigation -->
   <header class="sticky top-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-stone-200/80 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -476,26 +455,26 @@
         <!-- COL 1: CUSTOMER SUPPORT -->
         <div class="space-y-4">
           <div class="flex items-center space-x-2">
-            <span class="text-2xl">🥐</span>
-            <span class="heading-serif font-black text-xl text-white tracking-wide">Midnight Xotixs</span>
+            <span id="footer-logo-wrap" class="text-2xl">🥐</span>
+            <span id="footer-site-name" class="heading-serif font-black text-xl text-white tracking-wide">Midnight Xotixs</span>
           </div>
-          <p class="text-xs text-stone-400 leading-relaxed">
+          <p id="footer-bio" class="text-xs text-stone-400 leading-relaxed">
             Artisanal bakery and patisserie crafted daily with European heritage techniques and natural slow fermentation.
           </p>
           <div class="space-y-2 text-xs font-mono text-stone-300 pt-1">
             <p class="flex items-center space-x-2">
               <span class="text-amber-400">📞</span>
-              <a href="tel:+18005550199" class="hover:text-white transition-colors">+1 (800) 555-0199</a>
+              <a id="footer-phone" href="tel:+18005550199" class="hover:text-white transition-colors">+1 (800) 555-0199</a>
             </p>
             <p class="flex items-center space-x-2">
               <span class="text-emerald-400">💬</span>
-              <a href="https://wa.me/18005550199" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Direct Customer Chat</a>
+              <a id="footer-direct-chat" href="https://wa.me/18005550199" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Direct Customer Chat</a>
             </p>
             <p class="flex items-center space-x-2">
               <span class="text-amber-400">✉️</span>
-              <a href="mailto:contact@midnightxotixs.com" class="hover:text-white transition-colors">contact@midnightxotixs.com</a>
+              <a id="footer-email" href="mailto:contact@midnightxotixs.com" class="hover:text-white transition-colors">contact@midnightxotixs.com</a>
             </p>
-            <p class="text-[11px] text-stone-500 pt-1">
+            <p id="footer-hours" class="text-[11px] text-stone-500 pt-1">
               🕒 Mon - Sun: 7:00 AM - 9:00 PM
             </p>
           </div>
@@ -539,9 +518,8 @@
 
       </div>
 
-      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 font-mono">
-        <p>&copy; 2026 Midnight Xotixs. All rights reserved.</p>
-        <p class="text-[11px] text-stone-600">Artisanal Patisserie &bull; Modern Headless Architecture</p>
+      <div class="pt-8 flex items-center justify-center sm:justify-between text-xs text-stone-500 font-mono">
+        <p>&copy; 2026 <span id="footer-site-name-copy">Midnight Xotixs</span>. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -2631,7 +2609,7 @@
   async function loadBakery() {
     try {
       var results = await Promise.all([
-        sanityFetch('*[_type == "bakerySettings"][0]{ siteName, siteSubtitle, hotlinePhone, headOfficeAddress, contactEmail, businessHours, flashSaleTitle, heroSlider[]{ title, subtitle, "imageUrl": image.asset->url, buttonText } }').catch(function(){ return null; }),
+        sanityFetch('*[_type == "bakerySettings"][0]{ siteName, logo, "logoUrl": logo.asset->url, heroSlider[]{ title, subtitle, "imageUrl": image.asset->url, buttonText }, footerBio, phone, directChatUrl, directChatLabel, email, openingHours, siteSubtitle, hotlinePhone, headOfficeAddress, contactEmail, businessHours, flashSaleTitle }').catch(function(){ return null; }),
         sanityFetch('*[_type == "bakeryCategory"] | order(priority asc){ _id, title, "slug": slug.current, priority }').catch(function(){ return []; }),
         sanityFetch('*[_type == "bakeryProduct"]{ _id, title, description, price, salePrice, subCategoryText, isFlashSale, isNew, "categoryId": category->_id, "categoryTitle": category->title, "imageUrl": image.asset->url }').catch(function(){ return []; })
       ]);
@@ -2662,21 +2640,50 @@
         if (settings.siteName) {
           var nameEl = document.getElementById('nav-site-name');
           if (nameEl) nameEl.textContent = settings.siteName;
+          var footerName = document.getElementById('footer-site-name');
+          if (footerName) footerName.textContent = settings.siteName;
+          var copyName = document.getElementById('footer-site-name-copy');
+          if (copyName) copyName.textContent = settings.siteName;
+        }
+        if (settings.logoUrl) {
+          var footerLogo = document.getElementById('footer-logo-wrap');
+          if (footerLogo) footerLogo.innerHTML = '<img src="' + settings.logoUrl + '" alt="Logo" class="h-7 w-auto object-contain inline-block" />';
+        }
+        if (settings.footerBio) {
+          var bioEl = document.getElementById('footer-bio');
+          if (bioEl) bioEl.textContent = settings.footerBio;
+        }
+        var phoneVal = settings.phone || settings.hotlinePhone;
+        if (phoneVal) {
+          var footerPhone = document.getElementById('footer-phone');
+          if (footerPhone) {
+            footerPhone.textContent = phoneVal;
+            footerPhone.setAttribute('href', 'tel:' + phoneVal.replace(/[^0-9+]/g, ''));
+          }
+        }
+        var chatUrl = settings.directChatUrl || 'https://wa.me/18005550199';
+        var chatLbl = settings.directChatLabel || 'Direct Customer Chat';
+        var footerChat = document.getElementById('footer-direct-chat');
+        if (footerChat) {
+          footerChat.setAttribute('href', chatUrl);
+          footerChat.textContent = chatLbl;
+        }
+        var emailVal = settings.email || settings.contactEmail;
+        if (emailVal) {
+          var footerEmail = document.getElementById('footer-email');
+          if (footerEmail) {
+            footerEmail.textContent = emailVal;
+            footerEmail.setAttribute('href', 'mailto:' + emailVal);
+          }
+        }
+        var hoursVal = settings.openingHours || settings.businessHours;
+        if (hoursVal) {
+          var footerHours = document.getElementById('footer-hours');
+          if (footerHours) footerHours.textContent = '🕒 ' + hoursVal;
         }
         if (settings.siteSubtitle) {
           var subEl = document.getElementById('nav-site-subtitle');
           if (subEl) subEl.textContent = settings.siteSubtitle;
-        }
-        if (settings.hotlinePhone) {
-          var phoneEl = document.getElementById('top-hotline-phone');
-          if (phoneEl) {
-            phoneEl.setAttribute('href', 'tel:' + settings.hotlinePhone.replace(/[^0-9+]/g,''));
-            phoneEl.innerHTML = '<span class="text-amber-500">📞</span><span>' + settings.hotlinePhone + '</span>';
-          }
-        }
-        if (settings.businessHours) {
-          var hoursEl = document.getElementById('top-business-hours');
-          if (hoursEl) hoursEl.innerHTML = '<span>🕒</span><span>' + settings.businessHours + '</span>';
         }
         if (settings.flashSaleTitle) {
           var fsTitleEl = document.getElementById('flash-sale-heading');
