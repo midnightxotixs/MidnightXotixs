@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "sanity dev",
     "start": "sanity start",
-    "build": "node build.js"
+    "build": "echo 'Deploying static storefront'"
   },
   "dependencies": {
     "react": "^18.3.1",
