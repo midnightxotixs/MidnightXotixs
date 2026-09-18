@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "sanity dev",
     "start": "sanity start",
-    "build": "sanity build studio -y"
+    "build": "sanity build dist -y"
   },
   "dependencies": {
     "react": "^18.3.1",
