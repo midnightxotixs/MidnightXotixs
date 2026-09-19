@@ -718,17 +718,23 @@
           </div>
           <p id="pdetail-desc" class="text-xs sm:text-sm leading-relaxed text-stone-600"></p>
           
-          <!-- Stepper & Add to Cart -->
-          <div class="pt-3 border-t border-stone-100 flex items-center space-x-3">
-            <div class="flex items-center rounded-xl border border-stone-200 p-1" id="pdetail-stepper-wrap">
+          <!-- Stepper, Add to Cart & Buy Now -->
+          <div class="pt-3 border-t border-stone-100 flex flex-wrap sm:flex-nowrap items-center gap-3">
+            <div class="flex items-center rounded-xl border border-stone-200 p-1 shrink-0" id="pdetail-stepper-wrap">
               <button id="pdetail-qty-dec" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm text-stone-600 hover:bg-stone-100 transition-all active:scale-95 cursor-pointer">-</button>
               <span id="pdetail-qty-num" class="w-8 text-center font-mono font-bold text-sm text-stone-800">1</span>
               <button id="pdetail-qty-inc" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm text-stone-600 hover:bg-stone-100 transition-all active:scale-95 cursor-pointer">+</button>
             </div>
-            <button id="pdetail-add-btn" class="flex-1 min-h-[44px] py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all active:scale-95 shadow-md flex items-center justify-center space-x-2 cursor-pointer bg-[#1C1917] hover:bg-stone-900 text-white">
-              <span>🛒</span>
-              <span>+ Add to Cart</span>
-            </button>
+            <div class="flex-1 flex items-center gap-3 min-w-[200px]">
+              <button id="pdetail-add-btn" class="flex-1 min-h-[44px] py-2.5 px-3 sm:px-4 rounded-xl font-bold text-xs sm:text-sm transition-all active:scale-95 shadow-md flex items-center justify-center space-x-1.5 cursor-pointer bg-[#1C1917] hover:bg-stone-900 text-white whitespace-nowrap">
+                <span>🛒</span>
+                <span>+ Add to Cart</span>
+              </button>
+              <button id="pdetail-buy-now-btn" class="flex-1 min-h-[44px] py-2.5 px-3 sm:px-4 rounded-xl font-bold text-xs sm:text-sm transition-all active:scale-95 shadow-md flex items-center justify-center space-x-1.5 cursor-pointer bg-amber-600 hover:bg-amber-500 text-white whitespace-nowrap">
+                <span>⚡</span>
+                <span>Buy Now</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1802,11 +1808,18 @@
     var modal = document.getElementById('bakery-cart-modal');
     renderBakeryCartDrawer();
     if (modal) modal.style.display = 'flex';
+    if (!window.history.state || !window.history.state.modalOpen) {
+      try { history.pushState({ modalOpen: true, modalId: 'bakery-cart-modal' }, ''); } catch(e) {}
+    }
   }
 
-  function closeBakeryCartDrawer() {
+  function closeBakeryCartDrawer(fromPopState) {
     var modal = document.getElementById('bakery-cart-modal');
     if (modal) modal.style.display = 'none';
+    if (fromPopState !== true && window.history.state && window.history.state.modalOpen) {
+      modalCloseTriggeredBack = true;
+      try { window.history.back(); } catch(e) { modalCloseTriggeredBack = false; }
+    }
   }
 
   function renderBakeryCartDrawer() {
@@ -2266,6 +2279,8 @@
   /* ═══════════════════════════════════════════════════════════
      9. PRODUCT DETAILS MODAL
   ═══════════════════════════════════════════════════════════ */
+  var modalCloseTriggeredBack = false;
+
   function openProductDetails(item, isChamber) {
     if (!item) return;
     currentDetailItem = item;
@@ -2306,12 +2321,19 @@
 
     renderSuggestedItems(item);
     if (modal) modal.style.display = 'flex';
+    if (!window.history.state || !window.history.state.modalOpen) {
+      try { history.pushState({ modalOpen: true, modalId: 'product-details-modal' }, ''); } catch(e) {}
+    }
   }
 
-  function closeProductDetails() {
+  function closeProductDetails(fromPopState) {
     var modal = document.getElementById('product-details-modal');
     if (modal) modal.style.display = 'none';
     currentDetailItem = null;
+    if (fromPopState !== true && window.history.state && window.history.state.modalOpen) {
+      modalCloseTriggeredBack = true;
+      try { window.history.back(); } catch(e) { modalCloseTriggeredBack = false; }
+    }
   }
 
   function renderSuggestedItems(currentItem) {
@@ -2782,8 +2804,58 @@
 
 
   /* ═══════════════════════════════════════════════════════════
-     VAULT PRODUCT DETAILS MODAL CONTROLLER
+     VAULT CHECKOUT & PRODUCT DETAILS MODAL CONTROLLERS
   ═══════════════════════════════════════════════════════════ */
+  function calculateVaultTotal() {
+    var total = 0;
+    Object.values(chamberCart).forEach(function(item) {
+      var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
+      total += item.qty * clean;
+    });
+    return total;
+  }
+
+  function openVaultCheckout() {
+    var entries = Object.values(chamberCart);
+    if (entries.length === 0) { showToast('Your bag is empty.', 'amber'); return; }
+
+    var itemsEl = document.getElementById('vault-order-items');
+    var totalEl = document.getElementById('vault-order-total');
+    var total = 0;
+
+    if (itemsEl) {
+      itemsEl.innerHTML = entries.map(function(item) {
+        var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
+        total += item.qty * clean;
+        return '<div class="flex items-center justify-between text-xs font-sans">' +
+          '<span class="text-slate-300">' + item.qty + 'x ' + escAttr(item.title) + '</span>' +
+          '<span class="font-bold text-white">$' + (item.qty * clean).toFixed(2) + '</span>' +
+        '</div>';
+      }).join('');
+    }
+    if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
+
+    var formV = document.getElementById('vault-checkout-form-view');
+    var succV = document.getElementById('vault-checkout-success-view');
+    if (formV) formV.style.display = 'block';
+    if (succV) succV.style.display = 'none';
+
+    var vaultModal = document.getElementById('vault-checkout-modal');
+    if (vaultModal) vaultModal.style.display = 'flex';
+    if (!window.history.state || !window.history.state.modalOpen) {
+      try { history.pushState({ modalOpen: true, modalId: 'vault-checkout-modal' }, ''); } catch(e) {}
+    }
+  }
+
+  function closeVaultCheckout(fromPopState) {
+    var vaultModal = document.getElementById('vault-checkout-modal');
+    if (vaultModal) vaultModal.style.display = 'none';
+    if (fromPopState !== true && window.history.state && window.history.state.modalOpen) {
+      modalCloseTriggeredBack = true;
+      try { window.history.back(); } catch(e) { modalCloseTriggeredBack = false; }
+    }
+  }
+
   var currentVaultDetailItem = null;
 
   function openVaultProductModal(product) {
@@ -2820,12 +2892,19 @@
     renderVaultSuggestedItems(product);
 
     if (modal) modal.style.display = 'flex';
+    if (!window.history.state || !window.history.state.modalOpen) {
+      try { history.pushState({ modalOpen: true, modalId: 'vault-product-modal' }, ''); } catch(e) {}
+    }
   }
 
-  function closeVaultProductModal() {
+  function closeVaultProductModal(fromPopState) {
     var modal = document.getElementById('vault-product-modal');
     if (modal) modal.style.display = 'none';
     currentVaultDetailItem = null;
+    if (fromPopState !== true && window.history.state && window.history.state.modalOpen) {
+      modalCloseTriggeredBack = true;
+      try { window.history.back(); } catch(e) { modalCloseTriggeredBack = false; }
+    }
   }
 
   function renderVaultModalActions(product) {
@@ -2835,17 +2914,25 @@
     var currentQty = (chamberCart[product._id] ? chamberCart[product._id].qty : 0);
 
     if (currentQty > 0) {
-      actWrap.innerHTML = '<div class="flex items-center justify-between bg-[#0B0E14] border border-slate-800 p-1.5 rounded-xl">' +
-        '<span class="text-xs font-semibold text-slate-400 pl-3">In Bag:</span>' +
-        '<div class="flex items-center space-x-2">' +
-          '<button id="vault-modal-dec-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm flex items-center justify-center transition-all cursor-pointer">>−</button>' +
-          '<span class="font-bold text-sm text-white min-w-[2rem] text-center">' + currentQty + '</span>' +
-          '<button id="vault-modal-inc-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm flex items-center justify-center transition-all cursor-pointer">+</button>' +
+      actWrap.innerHTML = '<div class="flex items-center gap-3 w-full">' +
+        '<div class="flex-1 flex items-center justify-between bg-[#0B0E14] border border-slate-800 p-1.5 rounded-xl min-h-[48px]">' +
+          '<span class="text-xs font-semibold text-slate-400 pl-2">In Bag:</span>' +
+          '<div class="flex items-center space-x-1 sm:space-x-2">' +
+            '<button id="vault-modal-dec-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm flex items-center justify-center transition-all cursor-pointer">>−</button>' +
+            '<span class="font-bold text-sm text-white min-w-[1.5rem] text-center">' + currentQty + '</span>' +
+            '<button id="vault-modal-inc-btn" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm flex items-center justify-center transition-all cursor-pointer">+</button>' +
+          '</div>' +
         '</div>' +
+        '<button id="vault-modal-buy-now-btn" class="flex-1 min-h-[48px] py-3 px-3 sm:px-4 rounded-xl font-bold text-xs sm:text-sm text-slate-950 flex items-center justify-center space-x-1.5 transition-all active:scale-98 cursor-pointer bg-amber-500 hover:bg-amber-400 shadow-md whitespace-nowrap">' +
+          '<span>⚡</span>' +
+          '<span>Buy Now</span>' +
+        '</button>' +
       '</div>';
 
       var decBtn = document.getElementById('vault-modal-dec-btn');
       var incBtn = document.getElementById('vault-modal-inc-btn');
+      var buyNowBtn = document.getElementById('vault-modal-buy-now-btn');
+
       if (decBtn) {
         decBtn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -2872,13 +2959,28 @@
           renderVaultModalActions(product);
         });
       }
+      if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          closeVaultProductModal(true);
+          openVaultCheckout();
+        });
+      }
     } else {
-      actWrap.innerHTML = '<button id="vault-modal-add-btn" class="w-full min-h-[48px] py-3 px-6 rounded-xl font-semibold text-sm text-white flex items-center justify-center space-x-2 transition-all active:scale-98 cursor-pointer bg-slate-800 hover:bg-slate-700 border border-slate-700 shadow-sm">' +
-        '<span>🛒</span>' +
-        '<span>+ Add to Bag</span>' +
-      '</button>';
+      actWrap.innerHTML = '<div class="flex items-center gap-3 w-full">' +
+        '<button id="vault-modal-add-btn" class="flex-1 min-h-[48px] py-3 px-3 sm:px-4 rounded-xl font-semibold text-xs sm:text-sm text-white flex items-center justify-center space-x-1.5 transition-all active:scale-98 cursor-pointer bg-slate-800 hover:bg-slate-700 border border-slate-700 shadow-sm whitespace-nowrap">' +
+          '<span>🛒</span>' +
+          '<span>+ Add to Bag</span>' +
+        '</button>' +
+        '<button id="vault-modal-buy-now-btn" class="flex-1 min-h-[48px] py-3 px-3 sm:px-4 rounded-xl font-bold text-xs sm:text-sm text-slate-950 flex items-center justify-center space-x-1.5 transition-all active:scale-98 cursor-pointer bg-amber-500 hover:bg-amber-400 shadow-md whitespace-nowrap">' +
+          '<span>⚡</span>' +
+          '<span>Buy Now</span>' +
+        '</button>' +
+      '</div>';
 
       var addBtn = document.getElementById('vault-modal-add-btn');
+      var buyNowBtn = document.getElementById('vault-modal-buy-now-btn');
+
       if (addBtn) {
         addBtn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -2895,6 +2997,24 @@
           showToast('Added ' + product.title + ' to Bag', 'blue');
           renderChamberUI();
           renderVaultModalActions(product);
+        });
+      }
+      if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!chamberCart[product._id]) {
+            chamberCart[product._id] = { _id: product._id, title: product.title, price: product.price, stockQuantity: product.stockQuantity, qty: 0 };
+          }
+          if (product.stockQuantity && chamberCart[product._id].qty >= product.stockQuantity) {
+            showToast('⚠️ Maximum stock reached', 'amber');
+            return;
+          }
+          chamberCart[product._id].qty++;
+          try { localStorage.setItem(CART_KEY, JSON.stringify(chamberCart)); } catch(err) {}
+          updateChamberCartUI();
+          renderChamberUI();
+          closeVaultProductModal(true);
+          openVaultCheckout();
         });
       }
     }
@@ -3216,8 +3336,34 @@
 
     handleRouting();
 
-    // Popstate for Browser Navigation
-    window.addEventListener('popstate', function() {
+    // Popstate for Browser Navigation & Mobile Modal Back-button Interception
+    window.addEventListener('popstate', function(e) {
+      if (modalCloseTriggeredBack) {
+        modalCloseTriggeredBack = false;
+        return;
+      }
+
+      var bakeryPdetail = document.getElementById('product-details-modal');
+      var vaultPdetail  = document.getElementById('vault-product-modal');
+      var bakeryCart    = document.getElementById('bakery-cart-modal');
+      var vaultCheckout = document.getElementById('vault-checkout-modal');
+      var authModal     = document.getElementById('auth-modal');
+
+      var isBakeryPdetailOpen = bakeryPdetail && bakeryPdetail.style.display !== 'none' && !bakeryPdetail.classList.contains('hidden');
+      var isVaultPdetailOpen  = vaultPdetail && vaultPdetail.style.display !== 'none' && !vaultPdetail.classList.contains('hidden');
+      var isBakeryCartOpen    = bakeryCart && bakeryCart.style.display !== 'none' && !bakeryCart.classList.contains('hidden');
+      var isVaultCheckoutOpen = vaultCheckout && vaultCheckout.style.display !== 'none' && !vaultCheckout.classList.contains('hidden');
+      var isAuthModalOpen     = authModal && authModal.style.display !== 'none' && !authModal.classList.contains('hidden');
+
+      if (isBakeryPdetailOpen || isVaultPdetailOpen || isBakeryCartOpen || isVaultCheckoutOpen || isAuthModalOpen) {
+        if (isBakeryPdetailOpen) closeProductDetails(true);
+        if (isVaultPdetailOpen)  closeVaultProductModal(true);
+        if (isBakeryCartOpen)    closeBakeryCartDrawer(true);
+        if (isVaultCheckoutOpen) closeVaultCheckout(true);
+        if (isAuthModalOpen)     closeAuthModal();
+        return; // Consume the back navigation, keep user strictly on current page without losing session
+      }
+
       handleRouting();
     });
 
@@ -3672,6 +3818,17 @@
       });
     }
 
+    var pdetailBuyNow = document.getElementById('pdetail-buy-now-btn');
+    if (pdetailBuyNow) {
+      pdetailBuyNow.addEventListener('click', function() {
+        if (!currentDetailItem) return;
+        var pdetailImg = document.getElementById('pdetail-img-container').querySelector('img') || document.getElementById('pdetail-img-container');
+        addToBakeryCart(currentDetailItem, detailQuantity, pdetailImg);
+        closeProductDetails(true);
+        openBakeryCartDrawer();
+      });
+    }
+
     // Relock Vault
     var relockBtn = document.getElementById('relock-btn');
     if (relockBtn) {
@@ -3695,48 +3852,8 @@
     var vaultSubmitBtn = document.getElementById('vault-cod-submit-btn');
     var vaultDoneBtn   = document.getElementById('vault-success-done-btn');
 
-    function calculateVaultTotal() {
-      var total = 0;
-      Object.values(chamberCart).forEach(function(item) {
-        var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
-        total += item.qty * clean;
-      });
-      return total;
-    }
-
-    function openVaultCheckout() {
-      var entries = Object.values(chamberCart);
-      if (entries.length === 0) { showToast('Your bag is empty.', 'amber'); return; }
-
-      var itemsEl = document.getElementById('vault-order-items');
-      var totalEl = document.getElementById('vault-order-total');
-      var total = 0;
-
-      if (itemsEl) {
-        itemsEl.innerHTML = entries.map(function(item) {
-          var clean = parseFloat(String(item.price || '').replace(/[^0-9.]/g, '')) || 0;
-          total += item.qty * clean;
-          return '<div class="flex items-center justify-between text-xs font-sans">' +
-            '<span class="text-slate-300">' + item.qty + 'x ' + escAttr(item.title) + '</span>' +
-            '<span class="font-bold text-white">$' + (item.qty * clean).toFixed(2) + '</span>' +
-          '</div>';
-        }).join('');
-      }
-      if (totalEl) totalEl.textContent = '$' + total.toFixed(2);
-
-      var formV = document.getElementById('vault-checkout-form-view');
-      var succV = document.getElementById('vault-checkout-success-view');
-      if (formV) formV.style.display = 'block';
-      if (succV) succV.style.display = 'none';
-      if (vaultModal) vaultModal.style.display = 'flex';
-    }
-
-    function closeVaultCheckout() {
-      if (vaultModal) vaultModal.style.display = 'none';
-    }
-
     if (openVaultBtn)  openVaultBtn.addEventListener('click', openVaultCheckout);
-    if (closeVaultBtn) closeVaultBtn.addEventListener('click', closeVaultCheckout);
+    if (closeVaultBtn) closeVaultBtn.addEventListener('click', function() { closeVaultCheckout(); });
     if (vaultModal) {
       vaultModal.addEventListener('click', function(e) {
         if (e.target === vaultModal) closeVaultCheckout();
